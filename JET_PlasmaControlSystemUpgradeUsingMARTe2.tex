@@ -156,10 +156,61 @@ real-time \sep control \sep MARTe2 \sep JET \sep QA
 \label{sec:intro}
 %% Labels are used to cross-reference an item using \ref command.
 
-Section text. See Subsection \ref{subsec1}.
+\subsection{Background}
+
+Plasma Control Systems\footnote{PCS - Plasma Control System} are large and complex.
+There are variations in approach, but most fusion projects distinguish between
+the disciplines of algorithm design and real-time system implementation.
+The former abstracts higher level descriptions of the plasma control processes
+from the physics perspective. Thus dealing with magnetic, kinetic, MHD and error field
+control as well as wall conditioning, disruption and runaway electron control.
+Real-time system implementation must then map the control tasks into robust, resilient,
+deterministic control software. The implementation must deal with practical real-world
+constraints. These include signal processing to compute the required algorithm
+inputs, management of target control references throughout the shot, and provision 
+of exceptional handling strategies to resolve off-normal conditions (whether in the plasma,
+or in the sensor and actuator subsystems).
+
+\cite
+% https://www.sciencedirect.com/science/article/abs/pii/S0920379614000647
+% Physics of the conceptual design of the ITER plasma control system 
+
+This paper concentrates on the second challenge, of real-time plasma control system implementation.
+
+
+\subsection{Engineering Approaches}
+
+\begin{itemize}
+\item{Monolithic}
+\item{Distributed}
+\item{MBSE}
+\item{Custom Code}
+\item{Frameworks}
+\item{Integration Ecosystems}
+\end{itemize}
+
+
+\subsection{JET PCS Architecture}
+
+The JET PCS architecture was\footnote{JET is entering decommissioning, and although the PCS systems still exist, they are not longer operating.}
+{\em distributed} and {\em heterogeneous}.  The design choice to separate it into around 80 subsystems supported broad delegation of responsibility and
+promoted maximal separation of concerns. This proved to be beneficial as the project lifetime was repeatedly extended and as the machine configuration was 
+significantly upgraded.  The heterogenous hardware and software components selected for implementation were partly imposed by necessity as the project outlived successive generations of vendor supported  technology and partly by differences in requirements for individual subsystems.
+
+%% Level-1 paper ?
+
 
 \section{Materials and Methods}
 
+Overall coordination and configuration of these disparate systems was achieved through two unifying services.
+\subsection{Configuration Management}
+
+  Most importantly, the {\em Level-1} configuration management subsystem provided a consistent and detailed model of each subsystem. Representing the attributes and modifiable options for each subsystem as rich parameters, the {\em Level-1} database, user interfaces, and codes provided a meta-programming system for the overall PCS.  This configuration tooling was
+used to define all of the control settings to achieve a given experimental goal (parameter values, calibration, reference time series and inter-system dependencies).  This system tuning was required to be completed before a JET discharge could begin.  
+
+\subsection{Real-Time Data Network}
+
+The second unifying service was the real-time data network. This was a high performance, dedicated private network with low latency and low jitter communications between all of the PCS systems.  The communications topology was point to multi-point. Implementation translated across three generations of networking equipment.  The early version of the network ran over 100Mbps ethernet using UDP unicast. An upgrade in the mid 1990s introduced telecommunication standard equipment using ATM\footnote{} switches in which the delivery of data was configured in the switch. In 2016, motivated by the increasing difficulty in obtaining ATM equipment, the ITER SDN ethernet multicast solution was adopted.
 
 \section{Theory and Calculation}
 
