@@ -120,15 +120,17 @@ This paper describes the techniques used to demonstrate system correctness prior
 \end{abstract}
 
 %%Graphical abstract
-\begin{graphicalabstract}
+%% TODO: This is recommended
+%\begin{graphicalabstract}
 %\includegraphics{grabs}
-\end{graphicalabstract}
+%\end{graphicalabstract}
 
+%% TODO: This is recommended
 %%Research highlights
-\begin{highlights}
-\item Research highlight 1
-\item Research highlight 2
-\end{highlights}
+%%\begin{highlights}
+%\item Research highlight 1
+%\item Research highlight 2
+%\end{highlights}
 
 %% Keywords
 \begin{keyword}
@@ -171,7 +173,7 @@ inputs, management of target control references throughout the shot, and provisi
 of exceptional handling strategies to resolve off-normal conditions (whether in the plasma,
 or in the sensor and actuator subsystems).
 
-\cite
+% TODO\cite
 % https://www.sciencedirect.com/science/article/abs/pii/S0920379614000647
 % Physics of the conceptual design of the ITER plasma control system 
 
@@ -192,17 +194,46 @@ This paper concentrates on the second challenge, of real-time plasma control sys
 
 \subsection{JET PCS Architecture}
 
-The JET PCS architecture was\footnote{JET is entering decommissioning, and although the PCS systems still exist, they are not longer operating.}
-{\em distributed} and {\em heterogeneous}.  The design choice to separate it into around 80 subsystems supported broad delegation of responsibility and
+The JET PCS architecture was
+{\em distributed} and {\em heterogeneous}\footnote{JET has entered decommissioning, and although the PCS systems still exist, they no longer operate}.  
+The design choice to separate it into around 80 subsystems supported broad delegation of responsibility and
 promoted maximal separation of concerns. This proved to be beneficial as the project lifetime was repeatedly extended and as the machine configuration was 
-significantly upgraded.  The heterogenous hardware and software components selected for implementation were partly imposed by necessity as the project outlived successive generations of vendor supported  technology and partly by differences in requirements for individual subsystems.
-
-%% Level-1 paper ?
+significantly upgraded.  The heterogeneous hardware and software components selected for implementation were partly imposed by necessity as the project outlived successive generations of vendor supported  technology and partly by differences in requirements for individual subsystems.
 
 
-\section{Materials and Methods}
+%% FIGURE? JG03.363-1c ? The Felton diagram.
+
+%% TOCITE Level-1 paper ?
+
+\subsection{Primary Feedback Control Loops}
+\label{s_primary_fb}
+
+The primary feedback control loops can be seen as independent subsets of the overall JET PCS
+comprising sensor, state estimation and actuator control functions.
+
+\begin{enumerate}
+	\item{Magnetic sensors and the Plasma Current, Shape and Vertical Control}
+	\item{Density instrumentation, validation and gas feedback control.}
+	\item{Neutral-beam power injection control to achieve fixed reference.}
+	\item{Radio frequency power injection control to achieve fixed ion heating.}
+\end{enumerate}
+
+\begin{figure}[t]%% placement specifier
+%% Use \includegraphics command to insert graphic files. Place graphics files in 
+%% working directory.
+\centering%% For centre alignment of image.
+%\includegraphics{example-image-a}
+\vspace{1.5in}
+%% Use \caption command for figure caption and label.
+\caption{Figure Caption}\label{fig1}
+%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
+\end{figure}
+
+% RENAME Materials and Methods, but that is the spirit
+\section{Materials and Methods (Infrastructure and Architecture}
 
 Overall coordination and configuration of these disparate systems was achieved through two unifying services.
+
 \subsection{Configuration Management}
 
   Most importantly, the {\em Level-1} configuration management subsystem provided a consistent and detailed model of each subsystem. Representing the attributes and modifiable options for each subsystem as rich parameters, the {\em Level-1} database, user interfaces, and codes provided a meta-programming system for the overall PCS.  This configuration tooling was
@@ -212,25 +243,169 @@ used to define all of the control settings to achieve a given experimental goal 
 
 The second unifying service was the real-time data network. This was a high performance, dedicated private network with low latency and low jitter communications between all of the PCS systems.  The communications topology was point to multi-point. Implementation translated across three generations of networking equipment.  The early version of the network ran over 100Mbps ethernet using UDP unicast. An upgrade in the mid 1990s introduced telecommunication standard equipment using ATM\footnote{} switches in which the delivery of data was configured in the switch. In 2016, motivated by the increasing difficulty in obtaining ATM equipment, the ITER SDN ethernet multicast solution was adopted.
 
-\section{Theory and Calculation}
+% RENAME Materials and Methods, but that is the spirit
+\section{Theory and Calculation (Methodology and Design Approach)}
 
-\subsection{Theory}
+\subsection{JET Software Design Principles}
 
-The basis for the work.
+Engineers across the JET project recognised the need to structure applications to be highly data driven.
+This was achieved from early in the project in the architecture of the {\em drivers} and {\em general acquisition program (gap)} applications.
+These abstracted the representation of the electronics channels (drivers) and the signals to be acquired (gap) 
+from the details of the operating system.  New hardware was added by inserting additional records into 
+the drivers configuration database.  New, or modified signal collection definitions
+were created by updating the gap configuration database.  In both cases, objects in the 
+configuration databases implemented common behaviours relevant to the application requirements.
+A note of historical interest is that these applications were completed in the late 1980s
+but architecturally were extremely similar to the EPICS system whioch was first released in 1994.
+%\cite EPICS
 
-\subsection{Calculation}
+\subsubsection{Domain Specific Languages (DSLs)}
 
-The practical development from the theory.
+Where data driven applications achieve a certain level of reconfiguration, they are more commonly
+described in computer science as {\em domain specific languages (DSLs)}. DSLs are characterised
+as a programming language designed for a specific use case.  Benefits of DSLs are that they 
+offer a higher level of abstraction optimized for a specific class of problem. Two classes
+of domain specific language are typically identified. {\em External} DSLs separate the DSL
+code from the standard code (written in a general programming language).  {\em Internal} DSLs
+mix the DSL code and the general-purpose code in the same file.  This is general achieved by
+embedding the DSL into the general-purpose code as a set of libraries or extensions.
 
-\section{Results}
+In both cases, there is a challenge to adequately support the new task of programming
+in the invented language.  To be effective, general purpose programming languages must
+formally define syntax and semantics. They must be supplied with compilers, or interpreters.
+These language tools are expected to be extended with support for trapping and explaining
+syntax errors as a minimum, and semantic errors preferably.  To increase productivity, 
+engineers working in a language also expect more advanced features such as code completion
+and automated documentation.
+
+For external DSLs, providing language support for basic control flow and iteration
+can help to make programs more efficient and comprehensible.  A common design pattern
+to deliver this support is to use code templating and code generation.  This
+{\em meta-programming} increases productivity, but at the cost of adding another
+layer of complexity in the tool stack.
+
+
+\subsection{JET Real-time Central Controller}
+\label{s_rtcc}
+
+As described in \ref{s_primary_fb} the primary basic control were
+engineered as separate subsystems comprising broadly fixed algorithms
+for sensor signal processing, state estimation and feedback control.
+These had primary responsibility for establishing plasmas of an
+appropriate type to meet scientific task force baseline scenarios.
+
+To provide more advanced control, of plasma parameters for which the
+relationship between direct measurement and fixed actuator response, 
+it was necessary to add a more flexible and dynamic controller.
+
+Termed the {\em real-time central controller (RTCC)} this system was
+part of a suite of general real-time services targeting advanced
+real-time control research.  The RTCC system was an application 
+capable of receiving a very wide (and variable) set of input signals
+aggregated and managed by a companion system, the {\em real-time signal server (RTSS)}.
+
+The architecture of this RTCC application was the common pattern of
+a real-time execution engine configurable with a graph of signal
+processing blocks.  The library of blocks supported signal ingress,
+filtering and validation to achieve estimates of plasma parameter
+state.  Entities to implement control schemes, such as a proportional/integral/derivative
+(PID controller), transfer functions and general calculation support
+could then be combined to explore control concepts.  An option to
+use real-time computed references for the actuator systems, and to 
+use these in place of the nominal feedfoward time series was also
+provided.
+
+Software tools for control room staff provided an environment with
+which to prepare new control concepts which could be used during operations
+without a lengthy software validation and commissioning process.
+The justifications for permitting this were numerous architectural
+features and operational procedures which reduced the risk that a 
+serious mis-control of the machine might occur.
+
+The algorithm definitions, termed {\em RTCC networks}, formed a corpus
+of executable, reusable research results in the area of plasma control.
+
+The same architecture, but implemented with independent hardware
+and an independent configuration management system and procedure 
+was adopted as part of the project to protect the ITER-like wall
+(PIW project) in 2011.
+
+\subsubsection{Justification for Updating RTCC}
+
+Making the case for an upgrade to the RTCC system was organisationally
+challenging, in spite of the recognised technical limitations of the system.
+These included restrictions on the size and complexity of RTCC networks
+as well as the need for specialist training to become competent in
+using the system and re-engineering previously developed networks.
+
+\subsubsection{Upgrade Plan}
+
+Making the case for an upgrade to the RTCC system was organisationally
+challenging, in spite of the recognised technical limitations of the system.
+These included restrictions on the size and complexity of RTCC networks
+as well as the need for specialist training to become competent in
+using the system and re-engineering previously developed networks.
+
+
+
+\section{Upgrade Outcomes and Benefits}
+
+Each of the calculation blocks in the RTCC application were ported to MARTe2 {\em Functions}.
+Atypically, the standard block template consisted in a combined vector of value and status.
+This protocol was retained in the updated implementation. This was important to simplify
+translating algorithm definitions from the original notation to MARTe2 format.
+
+The outline structure of the RTCC2 MARTe2 application was istraightforward.
+High level service declarations common to most JET MARTe applications
+instantiated an introspection service, a pulse oriented state machine, 
+and the main data flow superstructure.
+
+Python translation support modules handled the translation of RTCC network 
+descriptions into MARTe2 configuration syntax, using the new {\em Functions}.
+In addition to generating the {\em Function} instances (a simple 1:1 mapping),
+the translation also created auxiliary objects to manage automatic
+recording of computed values.  Managing automatic name generation is one
+of the main tasks in this process.  This introduces a design question.  From
+the perspective of efficiency, and to simplify the translation code, 
+auto-generated names which lack comprehensibility are a good choice. 
+This leaves code review in the domain of the meta-programming code, 
+which is practical for checking the intent.  The disadvantage of this
+approach however is that if the detailed results from executing the 
+algorithms differ from expected values, it is difficult to analyse
+the intermediate signals as their relationship to the calculation is
+masked by the anonymous names.
+
 
 \section{Discussion}
 
+Granularity, reuse and code generation.
+
+The question of how to preserve human readability of generated code...
+
 \section{Conclusion}
+
+% Comments on DSLs and tooling.
+
 
 \section{Glossary}
 
 Field specific terms.
+
+\begin{itemize}
+\item[ATM]{Asynchronous Transmission Mode.  A low-latency telecommunications protocol standard.}
+\item[DSL]{Domain Specific Language}
+\item[MARTe]{Multi-threaded Application for Real-Time execution.  Software framework from JET.}
+\item[MARTe2]{Enhanced version of MARTe developed by F4E for ITER.}
+\item[Real-Time Thread]{The unit of concurrency in a MARTe2 application.}
+\item[DataSource]{A service which abstracts device drivers to handle application I/O in a MARTe2 application.}
+\item[Function]{The unit of compute in a MARTe2 application.  Each Real-Time Thread calls one or more Functions.}
+\item[JET]{Joint European Tokamak}
+\item[MBSE]{Model Based System Engineering}
+\item[PCS]{Plasma Control System}
+\item[RTCC]{Real-Time Central Controller.  A core application in the JET PCS.}
+\item[SDN]{Synchronous Databus Network.  An ITER real-time network protocol.}
+\item[UDP]{User Datagram Protocol. A connectionless data transport method in networking.}
+\end{itemize}
 
 \section{Abbreviations}
 
@@ -261,7 +436,7 @@ Using CRediT taxonomy.
 %% See https://www.elsevier.com/researcher/author/policies-and-guidelines/credit-author-statement
 \end{itemize}
 
-\sectuin{Funding}
+\section{Funding}
 
 This work was supported by $ldots$
 %% The Appendices part is started with the command \appendix;
@@ -444,3 +619,4 @@ Example citation, See \cite{lamport94}.
 \endinput
 %%
 %% End of file `elsarticle-template-num.tex'.
+
