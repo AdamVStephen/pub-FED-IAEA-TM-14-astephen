@@ -176,21 +176,18 @@ or in the sensor and actuator subsystems).
 % TODO\cite
 % https://www.sciencedirect.com/science/article/abs/pii/S0920379614000647
 % Physics of the conceptual design of the ITER plasma control system 
+%
+%
+% NO IT DOESN'T : IT DESCRIBES ONE UPGRADE WHICH TACKLED BOTH-ish
 
 This paper concentrates on the second challenge, of real-time plasma control system implementation.
 
+The order of the paper is $\ldots$ % TODO
 
-\subsection{Engineering Approaches}
 
-\begin{itemize}
-\item{Monolithic}
-\item{Distributed}
-\item{MBSE}
-\item{Custom Code}
-\item{Frameworks}
-\item{Integration Ecosystems}
-\end{itemize}
 
+% RENAME Materials and Methods, but that is the spirit
+\section{Architecture and Infrastructure}
 
 \subsection{JET PCS Architecture}
 
@@ -200,12 +197,20 @@ The design choice to separate it into around 80 subsystems supported broad deleg
 promoted maximal separation of concerns. This proved to be beneficial as the project lifetime was repeatedly extended and as the machine configuration was 
 significantly upgraded.  The heterogeneous hardware and software components selected for implementation were partly imposed by necessity as the project outlived successive generations of vendor supported  technology and partly by differences in requirements for individual subsystems.
 
-
-%% FIGURE? JG03.363-1c ? The Felton diagram.
-
-%% TOCITE Level-1 paper ?
+\begin{figure}[t]%% placement specifier
+%% Use \includegraphics command to insert graphic files. Place graphics files in 
+%% working directory.
+\centering%% For centre alignment of image.
+%\includegraphics{example-image-a}
+	\includegraphics{JG_Felton}
+\vspace{1.5in}
+%% Use \caption command for figure caption and label.
+\caption{Figure Caption}\label{fig1}
+%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
+\end{figure}
 
 \subsection{Primary Feedback Control Loops}
+
 \label{s_primary_fb}
 
 The primary feedback control loops can be seen as independent subsets of the overall JET PCS
@@ -217,73 +222,6 @@ comprising sensor, state estimation and actuator control functions.
 	\item{Neutral-beam power injection control to achieve fixed reference.}
 	\item{Radio frequency power injection control to achieve fixed ion heating.}
 \end{enumerate}
-
-\begin{figure}[t]%% placement specifier
-%% Use \includegraphics command to insert graphic files. Place graphics files in 
-%% working directory.
-\centering%% For centre alignment of image.
-%\includegraphics{example-image-a}
-\vspace{1.5in}
-%% Use \caption command for figure caption and label.
-\caption{Figure Caption}\label{fig1}
-%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
-\end{figure}
-
-% RENAME Materials and Methods, but that is the spirit
-\section{Materials and Methods (Infrastructure and Architecture}
-
-Overall coordination and configuration of these disparate systems was achieved through two unifying services.
-
-\subsection{Configuration Management}
-
-  Most importantly, the {\em Level-1} configuration management subsystem provided a consistent and detailed model of each subsystem. Representing the attributes and modifiable options for each subsystem as rich parameters, the {\em Level-1} database, user interfaces, and codes provided a meta-programming system for the overall PCS.  This configuration tooling was
-used to define all of the control settings to achieve a given experimental goal (parameter values, calibration, reference time series and inter-system dependencies).  This system tuning was required to be completed before a JET discharge could begin.  
-
-\subsection{Real-Time Data Network}
-
-The second unifying service was the real-time data network. This was a high performance, dedicated private network with low latency and low jitter communications between all of the PCS systems.  The communications topology was point to multi-point. Implementation translated across three generations of networking equipment.  The early version of the network ran over 100Mbps ethernet using UDP unicast. An upgrade in the mid 1990s introduced telecommunication standard equipment using ATM\footnote{} switches in which the delivery of data was configured in the switch. In 2016, motivated by the increasing difficulty in obtaining ATM equipment, the ITER SDN ethernet multicast solution was adopted.
-
-% RENAME Materials and Methods, but that is the spirit
-\section{Theory and Calculation (Methodology and Design Approach)}
-
-\subsection{JET Software Design Principles}
-
-Engineers across the JET project recognised the need to structure applications to be highly data driven.
-This was achieved from early in the project in the architecture of the {\em drivers} and {\em general acquisition program (gap)} applications.
-These abstracted the representation of the electronics channels (drivers) and the signals to be acquired (gap) 
-from the details of the operating system.  New hardware was added by inserting additional records into 
-the drivers configuration database.  New, or modified signal collection definitions
-were created by updating the gap configuration database.  In both cases, objects in the 
-configuration databases implemented common behaviours relevant to the application requirements.
-A note of historical interest is that these applications were completed in the late 1980s
-but architecturally were extremely similar to the EPICS system whioch was first released in 1994.
-%\cite EPICS
-
-\subsubsection{Domain Specific Languages (DSLs)}
-
-Where data driven applications achieve a certain level of reconfiguration, they are more commonly
-described in computer science as {\em domain specific languages (DSLs)}. DSLs are characterised
-as a programming language designed for a specific use case.  Benefits of DSLs are that they 
-offer a higher level of abstraction optimized for a specific class of problem. Two classes
-of domain specific language are typically identified. {\em External} DSLs separate the DSL
-code from the standard code (written in a general programming language).  {\em Internal} DSLs
-mix the DSL code and the general-purpose code in the same file.  This is general achieved by
-embedding the DSL into the general-purpose code as a set of libraries or extensions.
-
-In both cases, there is a challenge to adequately support the new task of programming
-in the invented language.  To be effective, general purpose programming languages must
-formally define syntax and semantics. They must be supplied with compilers, or interpreters.
-These language tools are expected to be extended with support for trapping and explaining
-syntax errors as a minimum, and semantic errors preferably.  To increase productivity, 
-engineers working in a language also expect more advanced features such as code completion
-and automated documentation.
-
-For external DSLs, providing language support for basic control flow and iteration
-can help to make programs more efficient and comprehensible.  A common design pattern
-to deliver this support is to use code templating and code generation.  This
-{\em meta-programming} increases productivity, but at the cost of adding another
-layer of complexity in the tool stack.
-
 
 \subsection{JET Real-time Central Controller}
 \label{s_rtcc}
@@ -330,13 +268,107 @@ and an independent configuration management system and procedure
 was adopted as part of the project to protect the ITER-like wall
 (PIW project) in 2011.
 
-\subsubsection{Justification for Updating RTCC}
+\subsubsection{RTCC Drivers for Upgrade}
+
+Infrastructure weaknesses $\ldots$
 
 Making the case for an upgrade to the RTCC system was organisationally
 challenging, in spite of the recognised technical limitations of the system.
 These included restrictions on the size and complexity of RTCC networks
 as well as the need for specialist training to become competent in
 using the system and re-engineering previously developed networks.
+
+\subsubsection{Requirements and Contraints}
+
+
+\begin{enumerate}
+	\item{Backwards compatibility}
+	\item{Increased capacity}
+	\item{Minimise risk to operations}
+	\item{Support new components (blocks)}
+	\item{Improve physics user experience}
+	\item{Enhance JET legacy (code and data)}
+\end{enumerate}
+
+\section{Methodology and Design Approach}
+
+% FIGURE? JG03.363-1c ? The Felton diagram.
+
+%% TOCITE Level-1 paper ?
+
+Overall coordination and configuration of these disparate systems was achieved through coordinating systems, services
+and applications.
+
+\subsection{JET Software Design Principles}
+
+Engineers across the JET project recognised the need to structure applications to be highly data driven.
+This was achieved from early in the project in the architecture of the {\em drivers} and {\em general acquisition program (gap)} applications.
+These abstracted the representation of the electronics channels (drivers) and the signals to be acquired (gap) 
+from the details of the operating system.  New hardware was added by inserting additional records into 
+the drivers configuration database.  New, or modified signal collection definitions
+were created by updating the gap configuration database.  In both cases, objects in the 
+configuration databases implemented common behaviours relevant to the application requirements.
+A note of historical interest is that these applications were completed in the late 1980s
+but architecturally were extremely similar to the EPICS system whioch was first released in 1994.
+%\cite EPICS
+
+\subsection{Software Frameworks}
+
+The JET CODAS diagnostics integration team designed a component oriented framework (CFW)
+for rapid application development. The design style was object oriented, though
+written in C due to legacy constraints.  At the core of the design was the concept
+that an application be described through a structured configuration file.
+The configuration file used a declarative language to compose an application
+from component instances. Each component provided a set of modifiable attributes.
+Attribute values could be constants (scalar, or user defined types) or 
+references to other components.  The target use case for this framework was supervisory
+control applications implementing monitoring and control, but operating 24x7 and 
+tasked with slow, asynchronous operations.
+
+In addition to defining the CFW declarative language, a broader descriptive language
+called CODAS Configuration Language (CCL) was designed in parallel.  This was motivated 
+to provide an efficient tool with which to create CFW "programs".  The observation
+was that as application complexity scales, a declarative component based system
+requires the powers of abstraction common to most general programming languages.
+i.e. It is desirable to be able to express iteration, conditional existence, 
+and algorithmically described variability.  Support for text manipulation is
+beneficial to be able to create human comprehensible names.
+
+A formal approach to describing the CCL system was taken, including use of W3C
+standards for managing namespaces and vocabularies, and making the declarative
+form compatible with RDF (resource data framework).
+
+Contemporaneously with this CFW development, the Plasma Operations Group had decided
+to take a very structurally equivalent approach to building real-time control applications.
+Their application, the now well known Multi-threaded Application for Real-Time execution (MARTe),
+also consists in a run-time which instantiates objects from a structured configuration file.
+Implemented in C++, and targeting high performance, low jitter, high reliability control
+applications it also provided some measure of tooling for rapid application development.
+To manage the aggregation and customisation of configuration files, MARTe at JET made
+use of the Level-1 configuration tool to manage templates, parameter substitution and
+code generation algorithms.
+
+JET plasma control made significant use of the MARTe system, implementing key systems
+including shape control, vertical stabilisation, walls (estimating the energy load on the first wall),
+EFCC control, vessel-thermal map and the ILW real-time protection sequencer.  These applications
+were in use from the early 2000s and were fully integrated with the other JET operations software
+(configuration, monitoring, data acquisition and the RTDN ATM network).
+
+Around 2014, at F4E, following failed attempts to find a comparable COTS software system 
+on the market, a project to harden MARTe to a level suitable for deployment at ITER 
+was undertaken.  The outcome of this work was MARTe2.  In addition to code review and improvement,
+
+
+\subsection{Real-Time Data Network}
+
+The second unifying service was the real-time data network. This was a high performance, dedicated private network with low latency and low jitter communications between all of the PCS systems.  The communications topology was point to multi-point. Implementation translated across three generations of networking equipment.  The early version of the network ran over 100Mbps ethernet using UDP unicast. An upgrade in the mid 1990s introduced telecommunication standard equipment using ATM\footnote{} switches in which the delivery of data was configured in the switch. In 2016, motivated by the increasing difficulty in obtaining ATM equipment, the ITER SDN ethernet multicast solution was adopted.
+
+\subsection{Configuration Management}
+
+  Most importantly, the {\em Level-1} configuration management subsystem provided a consistent and detailed model of each subsystem. Representing the attributes and modifiable options for each subsystem as rich parameters, the {\em Level-1} database, user interfaces, and codes provided a meta-programming system for the overall PCS.  This configuration tooling was
+used to define all of the control settings to achieve a given experimental goal (parameter values, calibration, reference time series and inter-system dependencies).  This system tuning was required to be completed before a JET discharge could begin.  
+
+ 
 
 \subsubsection{Upgrade Plan}
 
@@ -381,6 +413,45 @@ masked by the anonymous names.
 Granularity, reuse and code generation.
 
 The question of how to preserve human readability of generated code...
+
+\subsection{Engineering Approaches}
+
+\begin{itemize}
+\item{Monolithic}
+\item{Distributed}
+\item{MBSE}
+\item{Custom Code}
+\item{Frameworks}
+\item{Integration Ecosystems}
+\end{itemize}
+
+\subsubsection{Domain Specific Languages (DSLs)}
+
+Where data driven applications achieve a certain level of reconfiguration, they are more commonly
+described in computer science as {\em domain specific languages (DSLs)}. DSLs are characterised
+as a programming language designed for a specific use case.  Benefits of DSLs are that they 
+offer a higher level of abstraction optimized for a specific class of problem. Two classes
+of domain specific language are typically identified. {\em External} DSLs separate the DSL
+code from the standard code (written in a general programming language).  {\em Internal} DSLs
+mix the DSL code and the general-purpose code in the same file.  This is general achieved by
+embedding the DSL into the general-purpose code as a set of libraries or extensions.
+
+In both cases, there is a challenge to adequately support the new task of programming
+in the invented language.  To be effective, general purpose programming languages must
+formally define syntax and semantics. They must be supplied with compilers, or interpreters.
+These language tools are expected to be extended with support for trapping and explaining
+syntax errors as a minimum, and semantic errors preferably.  To increase productivity, 
+engineers working in a language also expect more advanced features such as code completion
+and automated documentation.
+
+For external DSLs, providing language support for basic control flow and iteration
+can help to make programs more efficient and comprehensible.  A common design pattern
+to deliver this support is to use code templating and code generation.  This
+{\em meta-programming} increases productivity, but at the cost of adding another
+layer of complexity in the tool stack.
+
+
+\
 
 \section{Conclusion}
 
