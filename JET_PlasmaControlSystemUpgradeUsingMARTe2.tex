@@ -19,8 +19,17 @@
 %% SP 2008/03/01
 %% $Id: elsarticle-template-num.tex 249 2024-04-06 10:51:24Z rishi $
 %%
-%\documentclass[preprint,12pt]{elsarticle}
+%%\documentclass[preprint,12pt]{elsarticle}
+
+\newif\ifpreprint
+\preprinttrue
+%
+
+\ifpreprint
+\documentclass[preprint]{elsarticle}
+\else
 \documentclass[5p]{elsarticle}
+\fi
 
 %% Use the option review to obtain double line spacing
 %% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
@@ -51,7 +60,7 @@
 %% \usepackage{lineno}
 
 % Own Packages
-\usepackage{float}
+%\usepackage{float}
 \usepackage{nomencl}
 \makenomenclature
 % Take nomenclature title from a section named Glossary to conform to Elsevier guidance for authors
@@ -106,10 +115,33 @@
 %%             state={},
 %%             country={}}
 
-\author{A.V.~Stephen} %% Author name
+	\author[UKAEA]{A.V.~Stephen} %% Author name
+	%\author[UKAEA]{A.V.~Stephen\corref{cor1}} %% Author name
+	\ead{adam.stephen@ukaea.uk}
+%% \author{Name\corref{cor1}\fnref{label2}}
+%% \ead{email address}
+\author[UKAEA]{A.~Goodyear}
+\author[UKAEA]{J.~Waterhouse}
+\author[UKAEA]{E.~Jones}
+\author[UKAEA]{P.A.~McCullen}
+\author[UKAEA]{C.~Boswell}
+\author[UKAEA]{N.~Petrella}
+\author[UKAEA]{P.~Fox}
+\author[UKAEA]{M.~Lennholm}
+\author[UKAEA]{M.~Wheatley}
+\author[UKAEA]{H.~Baker}
+\author[UKAEA]{A.~Parrott}
+\author[UKAEA]{E.~Miniauskas}
+\author[UKAEA]{K.~Purahoo}
+\author[UKAEA]{M.~Anderton}
+\author[UKAEA]{C.~Stuart}
+\author[UKAEA]{D.~Collishaw-Shepman}
+\author[UKAEA]{H.~Harmer}
+\author[UKAEA]{R.~Padden}
 
 %% Author affiliation
-\affiliation{organization={Computing Division, United Kingdom Atomic Energy Authority},%Department and Organization
+%\affiliation{organization={Computing Division, United Kingdom Atomic Energy Authority},%Department and Organization
+	\affiliation[UKAEA]{organization={United Kingdom Atomic Energy Authority},%Organization
             addressline={Culham Campus}, 
             city={Abingdon},
             postcode={OX14 3DB}, 
@@ -251,8 +283,8 @@ exploitation of the JET data.
 \subsection{JET PCS Infrastructure}
 \label{l_infrastructure}
 
-The JET PCS infrastructure was
-distributed} and heterogeneous\footnote{JET has entered decommissioning, and although the PCS systems still exist, they no longer operate}.  
+The JET PCS infrastructure was distributed and
+heterogeneous\footnote{JET has entered decommissioning, and although the PCS systems still exist, they no longer operate.}.  
 It was divided into around 80 subsystems spanning measurement, control, and protection functions.
 This separation was required partly for organisational reasons: to divide the responsibility, and the work.
 It was also beneficial to achieve sufficient decoupling to permit evolution without excessive risk.
@@ -270,7 +302,7 @@ The infrastructure became more fully connected with the introduction of a compre
 real-time data network.  This was initially implemented using Asynchronous Transfer Mode (ATM)
 telecomms technology (effective, but highly bespoke). A later upgrade extended the
 real-time network using standard ethernet equipment, and adopting the ITER Synchronous Databus
-Network (SDN) protocol.
+Network (SDN\cite{boncagniSynchronousDatabusNetwork2008}) protocol.
 
 
 \subsection{JET PCS Architecture}
@@ -286,13 +318,22 @@ and auxiliary real-time signal server (RTSS).
 
 Each of the individual systems may be implemented using a variety of technology.
 The unifying aspects of the architecture are a standard real-time data exchange
-protocol\cite{Felton}, and a common parameter management system (Level-1\cite{Farthing}).
+protocol\cite{feltonRealtimeMeasurementControl2005b}, and a common parameter management system (Level-1\cite{vanderbekenLevelSoftwareJET1989}).
 
-
+\ifpreprint
+\begin{figure}[!p]
+\else
 \begin{figure}[ht!]
+\fi
+
 \centering
+
+\ifpreprint
 \includegraphics[width=0.5\textwidth]{JG_Felton.PNG}
-	\caption{The JET Plasma Control System (PCS) architecture.  \cite{Felton99}}
+\else
+\includegraphics[width=1.0\textwidth]{JG_Felton.PNG}
+\fi
+\caption{The JET Plasma Control System (PCS) architecture from \cite{feltonRealtimeMeasurementControl2005b}.}
 \label{fig:pcs}
 \end{figure}
 
@@ -330,7 +371,11 @@ only scalar valued signals could be treated.  Vector oriented control
 schemes were possible, but had to be expressed as sets of scalar 
 expressions.
 
-\begin{figure}[ht!]%% placement specifier
+\ifpreprint
+\begin{figure}[p]
+\else
+\begin{figure}[ht!]
+\fi
 \centering
 \includegraphics[width=0.5\textwidth]{RTCC_TF1_BLOCK.PNG}
 \caption{The first order transfer function block. One of approximately 40 reusable components
@@ -357,7 +402,11 @@ While a supporting viewer which could render the defined network
 as a graph was available, the graphical view did not support
 editing.
 
-\begin{figure}[ht!]%% placement specifier
+\ifpreprint
+\begin{figure}[p]
+\else
+\begin{figure}[ht!]
+\fi
 \centering
 \includegraphics[width=0.5\textwidth]{L1RTCC.PNG}
 \caption{The tabular RTCC network editor, implemented in JET Level-1 software.}\label{fig:editor}
@@ -390,7 +439,7 @@ and could be used to trigger protective actions if limits were breached.
 
 Following the major ITER-like wall project in 2011, the original RTCC
 system was duplicated so that one instance be dedicated to running
-protection networks, while the other was used for experimental functions.
+protection networks, while the other was used for experimental functions\cite{edwardsRobustConfigurationJET2019}.
 This reduced the likelihood that a protection network be misconfigured.
 
 \subsubsection{RTCC Limitations}
@@ -404,7 +453,7 @@ and losing information.
 An upgrade to RTCC was required to be able to support the needs
 of the JET TaskForce planned experiments.  Planning the design, implement,
 testing and commissioning of the upgrade required considerable
-care given the criticality of the system to oeprations.
+care given the criticality of the system to operations.
 
 
 \subsubsection{Upgrade Project Requirements and Constraints}
@@ -434,99 +483,184 @@ files through scripts developed with legacy tools.
 
 \section{Methodology and Design Approach}
 
-% FIGURE? JG03.363-1c ? The Felton diagram.
+One direct route to 
+increased capacity and backwards compatibility (REQ-1 and REQ-2)  would have been to port the existing
+C code to run on a more performant platform. In theory, a good solution.  In 
+practice, there were risks in terms of moving the code to a new operating system,
+or finding new platform support for the existing operating system. While technically
+achievable, with no operational experience of the alternative platform, it was
+worth looking for a different solution, to better meet REQ-3.  This is not least because
+operational experience shows that new platforms often require a long period to eliminate
+edge case defects. This approach would not have offered any potential to meet the 
+stretch targets (REQ-4 and REQ-5).
 
-%% TOCITE Level-1 paper ?
+One of the most successful platforms for developing real-time applications
+both in JET and other fusion facilies is the Multi-threaded Application for
+Real-Time Execution (MARTe\cite{netoSurveyRecentMARTe2011}).
+This software framework is extremely modular and decouples data management
+from signal processing.  Figure~\ref{fig:MARTe} sketches some aspects of the framework.
+An application consists of one or more real-time threads, each of which marshals
+data from external sources and performs a series of calculations.  Supervisory objects
+deliver services including data collection, state management, and live introspection.
 
-Overall coordination and configuration of these disparate systems was achieved through coordinating systems, services
-and applications.
-
-\subsection{MARTe}
-
-\begin{figure}[ht!]%% placement specifier
+\ifpreprint
+\begin{figure}[p]
+\else
+\begin{figure}[ht!]
+\fi
 \centering
 \includegraphics[width=0.5\textwidth]{MARTE.PNG}
-%\vspace{1.5in}
-\caption{MARTe}\label{fig4}
+\caption{The MARTe C++ real-time framework permits rapid composition of a new application
+	from a deployment file which describes the component instances, attributes and links.
+	Each application is a tree of cooperating objects.  The components have been designed
+	to be compatible with robust, reliable, deterministic operation.}
+\label{fig:MARTe}
 \end{figure}
 
-\subsection{Software Frameworks}
+Fully proven on JET, for both control and protection applications
+this would meet REQ-1 and REQ-3. Indeed, it was possible to select 
+the latest release of the framework, MARTe2.  This has been 
+developed under the management of F4E to provide integration for
+a number of ITER systems. It includes some behavioural upgrades
+which make development more efficient, and has been industrially
+hardened\cite{netoAgileQualityAssurance2016}.  
 
-Contemporaneously with this CFW development, the Plasma Operations Group had decided
-to take a very structurally equivalent approach to building real-time control applications.
-Their application, the now well known Multi-threaded Application for Real-Time execution (MARTe),
-also consists in a run-time which instantiates objects from a structured configuration file.
-Implemented in C++, and targeting high performance, low jitter, high reliability control
-applications it also provided some measure of tooling for rapid application development.
-To manage the aggregation and customisation of configuration files, MARTe at JET made
-use of the Level-1 configuration tool to manage templates, parameter substitution and
-code generation algorithms.
+A further beneficial feature arose from the JET real-time
+network update in 2016\cite{waterhouseIntroductionITERCODAC2020a} to add support for the ITER 
+Synchronous Databus Network (SDN). This made MARTe2
+directly compatible with the available real-time signals.
 
-JET plasma control made significant use of the MARTe system, implementing key systems
-including shape control, vertical stabilisation, walls (estimating the energy load on the first wall),
-EFCC control, vessel-thermal map and the ILW real-time protection sequencer.  These applications
-were in use from the early 2000s and were fully integrated with the other JET operations software
-(configuration, monitoring, data acquisition and the RTDN ATM network).
+Two alternative methods for porting the RTCC network calculation system 
+to MARTe2 were considered. A monolithic approach, to wrap the calculation
+engine from the heart of RTCC as a single MARTe2 component would have
+had the least complexity in terms of testing.  However, this approach
+would have provided no benefit in terms of evolving the system. 
+Instead, each of the function blocks provided for RTCC were
+individually ported as MARTe2 function components.  The benefit
+of this scheme was that to extend the capability would only
+need additional MARTe2 functions to be added, and this was a simple task.
 
-Around 2014, at F4E, following failed attempts to find a comparable COTS software system 
-on the market, a project to harden MARTe to a level suitable for deployment at ITER 
-was undertaken.  The outcome of this work was MARTe2.  In addition to code review and improvement,
+The implementation therefore consisted of four tasks.  To create the 
+MARTe2 application outline.  To port and test each of the 40 function
+blocks.  To create a translation script to convert RTCC network
+descriptions into MARTe2 format. To run integration tests based on
+historical JET data to verify backwards compatibility.
 
+\section{From Validation to Operation}
 
-\subsection{Real-Time Data Network}
+As the software engineering work progressed, each of the deliverables
+was progressively integrated with operation systems.  Wherever
+possible, full coverage unit and integration tests were defined
+in the UKAEA gitlab continuous integration (CI) system.
+This included extensive regression tests of the integrated 
+application against recorded data.  This tested not only
+the correctness of the results, but the real-time performance
+running on comparable hardware.  To achieve this required
+some innovation in the use of containers as well as the
+Yocto environment for building custom linux distributions.
+%This is reported elsewhere by \cite{EdJones}.
 
-The second unifying service was the real-time data network. This was a high performance, dedicated private network with low latency and low jitter communications between all of the PCS systems.  The communications topology was point to multi-point. Implementation translated across three generations of networking equipment.  The early version of the network ran over 100Mbps ethernet using UDP unicast. An upgrade in the mid 1990s introduced telecommunication standard equipment using ATM\footnote{} switches in which the delivery of data was configured in the switch. In 2016, motivated by the increasing difficulty in obtaining ATM equipment, the ITER SDN ethernet multicast solution was adopted.
+JET machine management rules require strict adherence to procedures
+for defining and executing commissioning procedures for critical 
+systems\cite{kayeOperationJETUser2003}.  These procedures document the risks that have been 
+identified for each system, the supporting mitigations that 
+have been carried out prior to deployment, and the 
+integrated online end to end checks which must be demonstrated
+before a system can be used in full JET operation.
 
-\subsection{Configuration Management}
+Figure~\ref{fig:vandv} lists the types of checks which were applied
+to each of the software components.
 
-  Most importantly, the {\em Level-1} configuration management subsystem provided a consistent and detailed model of each subsystem. Representing the attributes and modifiable options for each subsystem as rich parameters, the {\em Level-1} database, user interfaces, and codes provided a meta-programming system for the overall PCS.  This configuration tooling was
-used to define all of the control settings to achieve a given experimental goal (parameter values, calibration, reference time series and inter-system dependencies).  This system tuning was required to be completed before a JET discharge could begin.  
-
-
-\section{Upgrade Outcomes and Benefits}
-
-%GUI RTCC Block Library
-
-%\begin{figure}[t]%% placement specifier
-%\centering
-%\includegraphics[width=0.5\textwidth]{GUI.PNG}
-%\caption{RTCC Block Library}
-%\label{fig6}
-%\end{figure}
-
-Each of the calculation blocks in the RTCC application were ported to MARTe2 {\em Functions}.
-Atypically, the standard block template consisted in a combined vector of value and status.
-This protocol was retained in the updated implementation. This was important to simplify
-translating algorithm definitions from the original notation to MARTe2 format.
-
-The outline structure of the RTCC2 MARTe2 application was istraightforward.
-High level service declarations common to most JET MARTe applications
-instantiated an introspection service, a pulse oriented state machine, 
-and the main data flow superstructure.
-
-Python translation support modules handled the translation of RTCC network 
-descriptions into MARTe2 configuration syntax, using the new {\em Functions}.
-In addition to generating the {\em Function} instances (a simple 1:1 mapping),
-the translation also created auxiliary objects to manage automatic
-recording of computed values.  Managing automatic name generation is one
-of the main tasks in this process.  This introduces a design question.  From
-the perspective of efficiency, and to simplify the translation code, 
-auto-generated names which lack comprehensibility are a good choice. 
-
-This leaves code review in the domain of the meta-programming code, 
-which is practical for checking the intent.  The disadvantage of this
-approach however is that if the detailed results from executing the 
-algorithms differ from expected values, it is difficult to analyse
-the intermediate signals as their relationship to the calculation is
-masked by the anonymous names.
+\ifpreprint
+\begin{figure}[p]
+\else
+\begin{figure}[ht!]
+\fi
+\centering
+\includegraphics[width=0.5\textwidth]{VandV.png}
+\caption{Validation and verification applied to each of the engineering categories related to delivering the upgrade.}
+\label{fig:vandv}
+\end{figure}
 
 
-\begin{figure}[t!]%% placement specifier
+\subsection{Deployment - Modes of Operation}
+
+JET operations had entered a particularly sensitive period at the time
+when RTCC2 was ready for deployment. To further minimise the risk, 
+senior management requested that the deployment plan allow for three
+modes of operation.
+
+The first mode was to retain the possibility to operate the full
+control system with RTCC2 in parasitic mode. RTCC2 would carry
+out all of the normal operations, would run connected to the
+real-time network, but {\em only} as a passive consumer.
+This eliminated almost all risk and was appropriate for any
+experiment which only needed RTCC1 capability.
+This mode was also an opportunity to exercise RTCC2 in the
+production environment and prove readiness for use.
+
+The second mode would permit RTCC2 to send control requests
+arising from executing control networks, but only to RTCC1.
+RTCC1 would then be able to select from the RTCC2 results
+to directly control the actuator systems.  This opened 
+up the extended capacity and capability of RTCC2, but 
+eliminated any possibility of unexpected interactions 
+between RTCC2 and the actuator systems, at the cost of
+one extra timestep delay.
+
+The third mode would enable full RTCC2 operation, to
+execute control networks, and to directly control the
+actuator systems.
+
+\ifpreprint
+\begin{figure}[p]
+\else
+\begin{figure}[ht!]
+\fi
 \centering
 \includegraphics[width=0.5\textwidth]{R1R2ARCH.PNG}
-%\vspace{1.5in}
-\caption{RTCC Block Library}\label{fig5}
+\caption{Multiple modes of operation were requested to reduce
+the risk of updating the plasma control system at a particularly
+	sensitive time for JET operations.}
+\label{fig:r1r2}
 \end{figure}
+
+These modes of operation are illustrated in figure~\ref{fig:r1r2}
+with the optional connections between RTCC2 and the other
+systems denoted as switches (shown in the open position, for
+parasitic operation).
+
+\subsection{Outcomes}
+
+All of the engineering to develop the new RTCC2 system were completed.
+In addition to the new MARTe2 components and the tooling for automatic
+conversion of RTCC control schemes to MARTe2 format, a graphical
+user interface was created.  This provides a more intuitive way to both
+view, and edit, these control graphs.
+
+All of the software components were subjected to rigorous testing.
+This was fully documented, and largely automated to support
+regression testing when code is committed to the repository.
+Automation was extended to fully building new Yocto images, 
+deploying these on an NFS server and booting a test server 
+from the image in order to run hardware-in-the-loop tests.
+
+This supportive quality assurance evidence was sufficient to 
+justify a commissioning procedure which had a minimal requirement
+for machine time to verify system conformity.  This is an important
+point as machine time is very expensive.
+
+The new system entered parasitic testing from JPN 101487.  The upgraded
+functionality was communicated to the task force experiment teams in 
+January 2023.  New components were requested to support implementation
+of an X-point radiation tracker control. The benefits of MARTe2 as
+an effective environment in which to develop new modules was proven
+as vector processing and a peak detector components were added.
+The vector processing significantly reduced the complexity of 
+the networks.  These features were used to succcessfully support detachment
+control experiments.
+
+
 \section{Discussion}
 
 Best practice in both system engineering and software engineering 
@@ -669,7 +803,6 @@ to deliver this support is to use code templating and code generation.  This
 layer of complexity in the tool stack.
 
 
-
 \section{Conclusion}
 
 % Comments on DSLs and tooling.
@@ -708,72 +841,9 @@ The implementation leaves the possibility to rerun former JET shots against a vi
 version of RTCC2. This opens the possibility to running virtual JET experiments.
 These can test alternative state estimation concepts just by replaying the historic data.
 By replacing dynamic elements with models, a closed loop virtual JET emulator could be demonstrated.
-This could have a number of valuable use cases.
+This could have a number of valuable uses.
 
-\newpage
 
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
-Lorem ipsum
 
 
 %%\section{Glossary}
@@ -796,234 +866,40 @@ Lorem ipsum
 %%\item[UDP]{User Datagram Protocol. A connectionless data transport method in networking.}
 %%\end{itemize}
 
-\section{Gloassary}
+\section{Abbreviations}
 
-\nomenclature{ATM}{Asynchronous}
+\nomenclature{ATM}{Asynchronous Transmission Mode}
 \nomenclature{DSL}{Domain Specific Language}
-\nomenclature{MARTe}{Multi-threaded Application for Real-Time execution.  Software framework from JET.}
-\nomenclature{MARTe2}{Enhanced version of MARTe developed by F4E for ITER.}
-\nomenclature{Real-Time Thread}{The unit of concurrency in a MARTe2 application.}
-\nomenclature{DataSource}{A service which abstracts device drivers to handle application I/O in a MARTe2 application.}
-\nomenclature{Function}{The unit of compute in a MARTe2 application.  Each Real-Time Thread calls one or more Functions.}
+\nomenclature{MARTe}{Multi-threaded Application for Real-Time execution}
+%\nomenclature{MARTe2}{Enhanced version of MARTe developed by F4E for ITER.}
+%\nomenclature{Real-Time Thread}{The unit of concurrency in a MARTe2 application.}
+%\nomenclature{DataSource}{A service which abstracts device drivers to handle application I/O in a MARTe2 application.}
+%\nomenclature{Function}{The unit of compute in a MARTe2 application.  Each Real-Time Thread calls one or more Functions.}
 \nomenclature{JET}{Joint European Tokamak}
 \nomenclature{MBSE}{Model Based System Engineering}
 \nomenclature{PCS}{Plasma Control System}
-\nomenclature{RTCC}{Real-Time Central Controller.  A core application in the JET PCS.}
-\nomenclature{SDN}{Synchronous Databus Network.  An ITER real-time network protocol.}
-\nomenclature{UDP}{User Datagram Protocol. A connectionless data transport method in networking.}
+\nomenclature{RTCC}{Real-Time Central Controller}
+\nomenclature{SDN}{Synchronous Databus Network}
+\nomenclature{UDP}{User Datagram Protocol}
 
 \printnomenclature
 
-\section{Abbreviations}
-
-Check that non-standard abbrevs are defined in a footnote on page 1.
-
 \section{Acknowledgements}
 
-Individuals who helped (but were not co-authors).
-
-\section{Author Contributions}
-Using CRediT taxonomy.
-
-\begin{itemize}
-\item[Conceptualization]{}
-\item[Data Curation]{}
-\item[Formal analysis ]{}
-\item[Funding acquisition]{}
-\item[Investigation]{}
-\item[Methodology]{}
-\item[Project administration]{}
-\item[Resources]{}
-\item[Software]{}
-\item[Supervision]{}
-\item[Validation]{}
-\item[Visualization]{}
-\item[Writing - draft]{}
-\item[Writing - review and editing]{}
-%% See https://www.elsevier.com/researcher/author/policies-and-guidelines/credit-author-statement
-\end{itemize}
+The MARTe software has been developed over a long time by members of the fusion community.
+Much of the software engineering that delivered the RTCC system and many other
+JET real-time systems was the work of Quentin King.
 
 \section{Funding}
+JET, which was previously a European facility, is now a UK facility collectively used by all European fusion laboratories under the EUROfusion consortium.  It is operated by the United Kingdom Atomic Energy Authority, supported by DESNZ and its European partners. This work, which has been carried out within the framework of the Contract for the Operation of the JET Facilities up to 31 October 2021, has been funded by the Euratom Research and Training  Programme.  Since 31 October 2021, UKAEA has continued to work with the EUROfusion Consortium as an Associated Partner of Max-Plank-Gesellschaft zur Förderung der Wissenschaft e.V represented by Max-Plank-Institut fur Plasmaphysik (“IPP”) pursuant to Article 9.1 of the EUROfusion Grant Agreement for Project No 101052200.   The views and opinions expressed herein do not necessarily reflect those of the European Commission.
 
-This work was supported by $ldots$
-%% The Appendices part is started with the command \appendix;
-%% appendix sections are then done as normal sections
+\bibliographystyle{elsarticle-num}
+\bibliography{IAEA24}{}
 
-\appendix
-\section{Example Appendix Section}
-\label{app1}
-
-Appendix text.
-
-%% For citations use: 
-%%       \cite{<label>} ==> [1]
-
-%%
-Example citation, See \cite{lamport94}.
-
-%% If you have bib database file and want bibtex to generate the
-%% bibitems, please use
-%%
-%%  \bibliographystyle{elsarticle-num} 
-%%  \bibliography{<your bibdatabase>}
-
-%% else use the following coding to input the bibitems directly in the
-%% TeX file.
-
-%% Refer following link for more details about bibliography and citations.
-%% https://en.wikibooks.org/wiki/LaTeX/Bibliography_Management
-
-\begin{thebibliography}{00}
-
-%% For numbered reference style
-%% \bibitem{label}
-%% Text of bibliographic item
-
-\bibitem{lamport94}
-  Leslie Lamport,
-  \textit{\LaTeX: a document preparation system},
-  Addison Wesley, Massachusetts,
-  2nd edition,
-  1994.
-
-\end{thebibliography}
 \end{document}
 
 \endinput
-%
-%% Template Code follows
-
-
-%% Use \subsection commands to start a subsection.
-\subsection{Example Subsection}
-\label{subsec1}
-
-Subsection text.
-
-%% Use \subsubsection, \paragraph, \subparagraph commands to 
-%% start 3rd, 4th and 5th level sections.
-%% Refer following link for more details.
-%% https://en.wikibooks.org/wiki/LaTeX/Document_Structure#Sectioning_commands
-
-\subsubsection{Mathematics}
-%% Inline mathematics is tagged between $ symbols.
-This is an example for the symbol $\alpha$ tagged as inline mathematics.
-
-%% Displayed equations can be tagged using various environments. 
-%% Single line equations can be tagged using the equation environment.
-\begin{equation}
-f(x) = (x+a)(x+b)
-\end{equation}
-
-%% Unnumbered equations are tagged using starred versions of the environment.
-%% amsmath package needs to be loaded for the starred version of equation environment.
-\begin{equation*}
-f(x) = (x+a)(x+b)
-\end{equation*}
-
-%% align or eqnarray environments can be used for multi line equations.
-%% & is used to mark alignment points in equations.
-%% \\ is used to end a row in a multiline equation.
-\begin{align}
- f(x) &= (x+a)(x+b) \\
-      &= x^2 + (a+b)x + ab
-\end{align}
-
-\begin{eqnarray}
- f(x) &=& (x+a)(x+b) \nonumber\\ %% If equation numbering is not needed for a row use \nonumber.
-      &=& x^2 + (a+b)x + ab
-\end{eqnarray}
-
-%% Unnumbered versions of align and eqnarray
-\begin{align*}
- f(x) &= (x+a)(x+b) \\
-      &= x^2 + (a+b)x + ab
-\end{align*}
-
-\begin{eqnarray*}
- f(x)&=& (x+a)(x+b) \\
-     &=& x^2 + (a+b)x + ab
-\end{eqnarray*}
-
-%% Refer following link for more details.
-%% https://en.wikibooks.org/wiki/LaTeX/Mathematics
-%% https://en.wikibooks.org/wiki/LaTeX/Advanced_Mathematics
-
-%% Use a table environment to create tables.
-%% Refer following link for more details.
-%% https://en.wikibooks.org/wiki/LaTeX/Tables
-\begin{table}[t]%% placement specifier
-%% Use tabular environment to tag the tabular data.
-%% https://en.wikibooks.org/wiki/LaTeX/Tables#The_tabular_environment
-\centering%% For centre alignment of tabular.
-\begin{tabular}{l c r}%% Table column specifiers
-%% Tabular cells are separated by &
-  1 & 2 & 3 \\ %% A tabular row ends with \\
-  4 & 5 & 6 \\
-  7 & 8 & 9 \\
-\end{tabular}
-%% Use \caption command for table caption and label.
-\caption{Table Caption}\label{fig1}
-\end{table}
-
-
-%% Use figure environment to create figures
-%% Refer following link for more details.
-%% https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
-\begin{figure}[t]%% placement specifier
-%% Use \includegraphics command to insert graphic files. Place graphics files in 
-%% working directory.
-\centering%% For centre alignment of image.
-\includegraphics{example-image-a}
-%% Use \caption command for figure caption and label.
-\caption{Figure Caption}\label{fig1}
-%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
-\end{figure}
-
-
-%% The Appendices part is started with the command \appendix;
-%% appendix sections are then done as normal sections
-\appendix
-\section{Example Appendix Section}
-\label{app1}
-
-Appendix text.
-
-%% For citations use: 
-%%       \cite{<label>} ==> [1]
-
-%%
-Example citation, See \cite{lamport94}.
-
-%% If you have bib database file and want bibtex to generate the
-%% bibitems, please use
-%%
-%%  \bibliographystyle{elsarticle-num} 
-%%  \bibliography{<your bibdatabase>}
-
-%% else use the following coding to input the bibitems directly in the
-%% TeX file.
-
-%% Refer following link for more details about bibliography and citations.
-%% https://en.wikibooks.org/wiki/LaTeX/Bibliography_Management
-
-\begin{thebibliography}{00}
-
-%% For numbered reference style
-%% \bibitem{label}
-%% Text of bibliographic item
-
-\bibitem{lamport94}
-  Leslie Lamport,
-  \textit{\LaTeX: a document preparation system},
-  Addison Wesley, Massachusetts,
-  2nd edition,
-  1994.
-
-\end{thebibliography}
-\end{document}
-
-\endinput
-%%
-%% End of file `elsarticle-template-num.tex'.
-
+@article{netoUseCasesJoint2015,
+@book{netoMARTeFrameworkMiddleware2011,
+@inproceedings{netoAgileQualityAssurance2016,
+@article{netoSurveyRecentMARTe2011,
