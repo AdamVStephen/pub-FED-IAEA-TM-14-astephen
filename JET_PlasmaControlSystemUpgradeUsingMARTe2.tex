@@ -19,7 +19,8 @@
 %% SP 2008/03/01
 %% $Id: elsarticle-template-num.tex 249 2024-04-06 10:51:24Z rishi $
 %%
-\documentclass[preprint,12pt]{elsarticle}
+%\documentclass[preprint,12pt]{elsarticle}
+\documentclass[5p]{elsarticle}
 
 %% Use the option review to obtain double line spacing
 %% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
@@ -48,6 +49,13 @@
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
 %% for the whole article with \linenumbers.
 %% \usepackage{lineno}
+
+% Own Packages
+\usepackage{float}
+\usepackage{nomencl}
+\makenomenclature
+% Take nomenclature title from a section named Glossary to conform to Elsevier guidance for authors
+\renewcommand{\nomname}{\vspace{-.25in}}
 
 \journal{Fusion Engineering and Design}
 
@@ -248,13 +256,12 @@ The design choice to separate it into around 80 subsystems supported broad deleg
 promoted maximal separation of concerns. This proved to be beneficial as the project lifetime was repeatedly extended and as the machine configuration was 
 significantly upgraded.  The heterogeneous hardware and software components selected for implementation were partly imposed by necessity as the project outlived successive generations of vendor supported  technology and partly by differences in requirements for individual subsystems.
 
-\begin{figure}[t]%% placement specifier
+\begin{figure}[ht!]%% placement specifier
 %% Use \includegraphics command to insert graphic files. Place graphics files in 
 %% working directory.
 \centering%% For centre alignment of image.
 %\includegraphics{example-image-a}
-	\includegraphics{JG_Felton}
-\vspace{1.5in}
+	\includegraphics[width=0.5\textwidth]{JG_Felton}
 %% Use \caption command for figure caption and label.
 \caption{Figure Caption}\label{fig1}
 %% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
@@ -277,12 +284,6 @@ comprising sensor, state estimation and actuator control functions.
 \subsection{JET Real-Time Central Controller}
 \label{s_rtcc}
 
-As described in \ref{s_primary_fb} the primary basic control were
-engineered as separate subsystems comprising broadly fixed algorithms
-for sensor signal processing, state estimation and feedback control.
-These had primary responsibility for establishing plasmas of an
-appropriate type to meet scientific task force baseline scenarios.
-
 To provide more advanced control, of plasma parameters for which the
 relationship between direct measurement and fixed actuator response, 
 it was necessary to add a more flexible and dynamic controller.
@@ -304,15 +305,24 @@ use real-time computed references for the actuator systems, and to
 use these in place of the nominal feedfoward time series was also
 provided.
 
-Software tools for control room staff provided an environment with
-which to prepare new control concepts which could be used during operations
-without a lengthy software validation and commissioning process.
-The justifications for permitting this were numerous architectural
-features and operational procedures which reduced the risk that a 
-serious mis-control of the machine might occur.
+\begin{figure}[ht!]%% placement specifier
+\centering
+	\includegraphics[width=0.5\textwidth]{RTCC_TF1_BLOCK.PNG}
+%\vspace{1.5in}
+\caption{RTCC Block Library}\label{fig2}
+\end{figure}
+
+
 
 The algorithm definitions, termed {\em RTCC networks}, formed a corpus
 of executable, reusable research results in the area of plasma control.
+
+\begin{figure}[ht!]%% placement specifier
+\centering
+\includegraphics[width=0.5\textwidth]{L1RTCC.PNG}
+%\vspace{1.5in}
+\caption{RTCC Block Library}\label{fig3}
+\end{figure}
 
 The same architecture, but implemented with independent hardware
 and an independent configuration management system and procedure 
@@ -364,44 +374,16 @@ if possible would in addition
 Overall coordination and configuration of these disparate systems was achieved through coordinating systems, services
 and applications.
 
-\subsection{JET Software Design Principles}
+\subsection{MARTe}
 
-Engineers across the JET project recognised the need to structure applications to be highly data driven.
-This was achieved from early in the project in the architecture of the {\em drivers} and {\em general acquisition program (gap)} applications.
-These abstracted the representation of the electronics channels (drivers) and the signals to be acquired (gap) 
-from the details of the operating system.  New hardware was added by inserting additional records into 
-the drivers configuration database.  New, or modified signal collection definitions
-were created by updating the gap configuration database.  In both cases, objects in the 
-configuration databases implemented common behaviours relevant to the application requirements.
-A note of historical interest is that these applications were completed in the late 1980s
-but architecturally were extremely similar to the EPICS system whioch was first released in 1994.
-%\cite EPICS
+\begin{figure}[ht!]%% placement specifier
+\centering
+\includegraphics[width=0.5\textwidth]{MARTE.PNG}
+%\vspace{1.5in}
+\caption{MARTe}\label{fig4}
+\end{figure}
 
 \subsection{Software Frameworks}
-
-The JET CODAS diagnostics integration team designed a component oriented framework (CFW)
-for rapid application development. The design style was object oriented, though
-written in C due to legacy constraints.  At the core of the design was the concept
-that an application be described through a structured configuration file.
-The configuration file used a declarative language to compose an application
-from component instances. Each component provided a set of modifiable attributes.
-Attribute values could be constants (scalar, or user defined types) or 
-references to other components.  The target use case for this framework was supervisory
-control applications implementing monitoring and control, but operating 24x7 and 
-tasked with slow, asynchronous operations.
-
-In addition to defining the CFW declarative language, a broader descriptive language
-called CODAS Configuration Language (CCL) was designed in parallel.  This was motivated 
-to provide an efficient tool with which to create CFW "programs".  The observation
-was that as application complexity scales, a declarative component based system
-requires the powers of abstraction common to most general programming languages.
-i.e. It is desirable to be able to express iteration, conditional existence, 
-and algorithmically described variability.  Support for text manipulation is
-beneficial to be able to create human comprehensible names.
-
-A formal approach to describing the CCL system was taken, including use of W3C
-standards for managing namespaces and vocabularies, and making the declarative
-form compatible with RDF (resource data framework).
 
 Contemporaneously with this CFW development, the Plasma Operations Group had decided
 to take a very structurally equivalent approach to building real-time control applications.
@@ -433,18 +415,15 @@ The second unifying service was the real-time data network. This was a high perf
   Most importantly, the {\em Level-1} configuration management subsystem provided a consistent and detailed model of each subsystem. Representing the attributes and modifiable options for each subsystem as rich parameters, the {\em Level-1} database, user interfaces, and codes provided a meta-programming system for the overall PCS.  This configuration tooling was
 used to define all of the control settings to achieve a given experimental goal (parameter values, calibration, reference time series and inter-system dependencies).  This system tuning was required to be completed before a JET discharge could begin.  
 
-\subsubsection{Upgrade Plan}
-
-Making the case for an upgrade to the RTCC system was organisationally
-challenging, in spite of the recognised technical limitations of the system.
-These included restrictions on the size and complexity of RTCC networks
-as well as the need for specialist training to become competent in
-using the system and re-engineering previously developed networks.
-
-
 
 \section{Upgrade Outcomes and Benefits}
-
+RTCC Block Library
+\begin{figure}[t]%% placement specifier
+\centering
+	\includegraphics[width=0.5\textwidth]{GUI.PNG}
+%\vspace{1.5in}
+\caption{RTCC Block Library}\label{fig6}
+\end{figure}
 Each of the calculation blocks in the RTCC application were ported to MARTe2 {\em Functions}.
 Atypically, the standard block template consisted in a combined vector of value and status.
 This protocol was retained in the updated implementation. This was important to simplify
@@ -471,6 +450,12 @@ the intermediate signals as their relationship to the calculation is
 masked by the anonymous names.
 
 
+\begin{figure}[t!]%% placement specifier
+\centering
+\includegraphics[width=0.5\textwidth]{R1R2ARCH.PNG}
+%\vspace{1.5in}
+\caption{RTCC Block Library}\label{fig5}
+\end{figure}
 \section{Discussion}
 
 Best practice in both system engineering and software engineering 
@@ -500,7 +485,7 @@ From a computer science point of view, there is no theoretical difference
 between high-level and low-level languages.  They are invariably
 turing complete and hence equivalent. The question is then whether the
 tools are effective in supporting subject matter experts and 
-design/implementation engineers to meet system objectives.
+implementation engineers to meet system objectives.
 Automated support for assuring quality can be applied at three
 levels.
 
@@ -654,26 +639,109 @@ These can test alternative state estimation concepts just by replaying the histo
 By replacing dynamic elements with models, a closed loop virtual JET emulator could be demonstrated.
 This could have a number of valuable use cases.
 
+\newpage
 
-\section{Glossary}
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
 
-Field specific terms.
 
-\begin{itemize}
-\item[ATM]{Asynchronous Transmission Mode.  A low-latency telecommunications protocol standard.}
-\item[DSL]{Domain Specific Language}
-\item[MARTe]{Multi-threaded Application for Real-Time execution.  Software framework from JET.}
-\item[MARTe2]{Enhanced version of MARTe developed by F4E for ITER.}
-\item[Real-Time Thread]{The unit of concurrency in a MARTe2 application.}
-\item[DataSource]{A service which abstracts device drivers to handle application I/O in a MARTe2 application.}
-\item[Function]{The unit of compute in a MARTe2 application.  Each Real-Time Thread calls one or more Functions.}
-\item[JET]{Joint European Tokamak}
-\item[MBSE]{Model Based System Engineering}
-\item[PCS]{Plasma Control System}
-\item[RTCC]{Real-Time Central Controller.  A core application in the JET PCS.}
-\item[SDN]{Synchronous Databus Network.  An ITER real-time network protocol.}
-\item[UDP]{User Datagram Protocol. A connectionless data transport method in networking.}
-\end{itemize}
+%%\section{Glossary}
+%%
+%%
+%%Field specific terms.
+%%\begin{itemize}
+%%\item[ATM]{Asynchronous Transmission Mode.  A low-latency telecommunications protocol standard.}
+%%\item[DSL]{Domain Specific Language}
+%%\item[MARTe]{Multi-threaded Application for Real-Time execution.  Software framework from JET.}
+%%\item[MARTe2]{Enhanced version of MARTe developed by F4E for ITER.}
+%%\item[Real-Time Thread]{The unit of concurrency in a MARTe2 application.}
+%%\item[DataSource]{A service which abstracts device drivers to handle application I/O in a MARTe2 application.}
+%%\item[Function]{The unit of compute in a MARTe2 application.  Each Real-Time Thread calls one or more Functions.}
+%%\item[JET]{Joint European Tokamak}
+%%\item[MBSE]{Model Based System Engineering}
+%%\item[PCS]{Plasma Control System}
+%%\item[RTCC]{Real-Time Central Controller.  A core application in the JET PCS.}
+%%\item[SDN]{Synchronous Databus Network.  An ITER real-time network protocol.}
+%%\item[UDP]{User Datagram Protocol. A connectionless data transport method in networking.}
+%%\end{itemize}
+
+\section{Gloassary}
+
+\nomenclature{ATM}{Asynchronous}
+\nomenclature{DSL}{Domain Specific Language}
+\nomenclature{MARTe}{Multi-threaded Application for Real-Time execution.  Software framework from JET.}
+\nomenclature{MARTe2}{Enhanced version of MARTe developed by F4E for ITER.}
+\nomenclature{Real-Time Thread}{The unit of concurrency in a MARTe2 application.}
+\nomenclature{DataSource}{A service which abstracts device drivers to handle application I/O in a MARTe2 application.}
+\nomenclature{Function}{The unit of compute in a MARTe2 application.  Each Real-Time Thread calls one or more Functions.}
+\nomenclature{JET}{Joint European Tokamak}
+\nomenclature{MBSE}{Model Based System Engineering}
+\nomenclature{PCS}{Plasma Control System}
+\nomenclature{RTCC}{Real-Time Central Controller.  A core application in the JET PCS.}
+\nomenclature{SDN}{Synchronous Databus Network.  An ITER real-time network protocol.}
+\nomenclature{UDP}{User Datagram Protocol. A connectionless data transport method in networking.}
+
+\printnomenclature
 
 \section{Abbreviations}
 

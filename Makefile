@@ -3,7 +3,7 @@
 file=JET_PlasmaControlSystemUpgradeUsingMARTe2
 
 
-all: pdf out 
+all: pdf out nomen
 	make pdf
 	make pdf
 
@@ -18,7 +18,10 @@ index:
 	makeindex -s gind.ist -o $(file).ind $(file).idx 
 
 changes:
-	makeindex -s gglo.ist -o $(file).gls $(file).glo
+	makeindex -s nomencl.ist -o $(file).gls $(file).glo
+
+nomen:
+	makeindex $(file).nlo -s nomencl.ist -o $(file).nls 
 
 xview:
 #	xpdf -z 200 $(file).pdf &>/dev/null
