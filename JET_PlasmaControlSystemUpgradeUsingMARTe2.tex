@@ -246,124 +246,191 @@ exploitation of the JET data.
 
 
 % RENAME Materials and Methods, but that is the spirit
-\section{Architecture and Infrastructure}
+\section{Infrastructure and Architecture}
+
+\subsection{JET PCS Infrastructure}
+\label{l_infrastructure}
+
+The JET PCS infrastructure was
+distributed} and heterogeneous\footnote{JET has entered decommissioning, and although the PCS systems still exist, they no longer operate}.  
+It was divided into around 80 subsystems spanning measurement, control, and protection functions.
+This separation was required partly for organisational reasons: to divide the responsibility, and the work.
+It was also beneficial to achieve sufficient decoupling to permit evolution without excessive risk.
+
+The variability in technologies in implementation arose partly from differences in
+optimal design choices and constraints across the project.  It was also enforced
+as the project lifetime extended and as generations of software and hardware
+evolved through industry cycles.
+
+Where collections of subsystems were required to work collectively, real-time data was
+shared as required. As one example, magnetics sensor data was acquired by the KC1D
+diagnostic, and provided to the plasma shape and position controller.  During early
+phases of the project, these real-time links were dedicated point to point connections.
+The infrastructure became more fully connected with the introduction of a comprehensive
+real-time data network.  This was initially implemented using Asynchronous Transfer Mode (ATM)
+telecomms technology (effective, but highly bespoke). A later upgrade extended the
+real-time network using standard ethernet equipment, and adopting the ITER Synchronous Databus
+Network (SDN) protocol.
+
 
 \subsection{JET PCS Architecture}
+\label{l_architecture}
 
-The JET PCS architecture was
-{\em distributed} and {\em heterogeneous}\footnote{JET has entered decommissioning, and although the PCS systems still exist, they no longer operate}.  
-The design choice to separate it into around 80 subsystems supported broad delegation of responsibility and
-promoted maximal separation of concerns. This proved to be beneficial as the project lifetime was repeatedly extended and as the machine configuration was 
-significantly upgraded.  The heterogeneous hardware and software components selected for implementation were partly imposed by necessity as the project outlived successive generations of vendor supported  technology and partly by differences in requirements for individual subsystems.
+The JET PCS architecture is shown in figure~\ref{fig:pcs}. 
+It comprises four main groups: measurements, local feedback, global feedback and actuators.
+The arrows indicate information flows, including pre-configured parameter values, and
+real-time data.  Some of the core functions operate mostly within the inner local feedback
+loop.  This includes the main magnetic, heating and fuelling loops.  More sophisticated
+control, and protection, are provided through the real-time central controller (RTCC) 
+and auxiliary real-time signal server (RTSS).
 
-\begin{figure}[ht!]%% placement specifier
-%% Use \includegraphics command to insert graphic files. Place graphics files in 
-%% working directory.
-\centering%% For centre alignment of image.
-%\includegraphics{example-image-a}
-	\includegraphics[width=0.5\textwidth]{JG_Felton}
-%% Use \caption command for figure caption and label.
-\caption{Figure Caption}\label{fig1}
-%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
+Each of the individual systems may be implemented using a variety of technology.
+The unifying aspects of the architecture are a standard real-time data exchange
+protocol\cite{Felton}, and a common parameter management system (Level-1\cite{Farthing}).
+
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=0.5\textwidth]{JG_Felton.PNG}
+	\caption{The JET Plasma Control System (PCS) architecture.  \cite{Felton99}}
+\label{fig:pcs}
 \end{figure}
-
-\subsection{Primary Feedback Control Loops}
-
-\label{s_primary_fb}
-
-The primary feedback control loops can be seen as independent subsets of the overall JET PCS
-comprising sensor, state estimation and actuator control functions.
-
-\begin{enumerate}
-	\item{Magnetic sensors and the Plasma Current, Shape and Vertical Control}
-	\item{Density instrumentation, validation and gas feedback control.}
-	\item{Neutral-beam power injection control to achieve fixed reference.}
-	\item{Radio frequency power injection control to achieve fixed ion heating.}
-\end{enumerate}
 
 \subsection{JET Real-Time Central Controller}
 \label{s_rtcc}
 
+The function of the standard local control systems was to establish 
+common plasma operating states (scenarios), mostly based on 
+pre-calculated feed-forward references (with feedback control to stabilise
+around particular operating points).  As such, these control systems
+had a stable development lifecycle, with modifications and enhancements
+generally being implemented during long shutdown periods.
+
 To provide more advanced control, of plasma parameters for which the
 relationship between direct measurement and fixed actuator response, 
 it was necessary to add a more flexible and dynamic controller.
+This real-time central controller (RTCC) provided a library of
+reusable calculation blocks.  Using a custom editor, the physics
+operator was permitted to design a control algorithm as a 
+sequential graph (or {\em network}) of up to 200 blocks.
+Up to four concurrent RTCC networks could be executed.
 
-Termed the {\em real-time central controller (RTCC)} this system was
-part of a suite of general real-time services targeting advanced
-real-time control research.  The RTCC system was an application 
-capable of receiving a very wide (and variable) set of input signals
-aggregated and managed by a companion system, the {\em real-time signal server (RTSS)}.
+Figure~\ref{fig:tf} shows the documentation for one of these calculation
+blocks (a first order transfer function). Each block received a variable
+number of analogue inputs (continuously varying signals) as well as
+one digital input. Blocks to express logical combinations, as well as
+signal transformation were provided.  
+The RTCC networks could therefore encompass 
+control flow as well as signal processing.
 
-The architecture of this RTCC application was the common pattern of
-a real-time execution engine configurable with a graph of signal
-processing blocks.  The library of blocks supported signal ingress,
-filtering and validation to achieve estimates of plasma parameter
-state.  Entities to implement control schemes, such as a proportional/integral/derivative
-(PID controller), transfer functions and general calculation support
-could then be combined to explore control concepts.  An option to
-use real-time computed references for the actuator systems, and to 
-use these in place of the nominal feedfoward time series was also
-provided.
+Provision was made for all of the
+usual mathematical operators, as well as for higher level functions such
+as waveform generation, and PID control.  One limitation was that
+only scalar valued signals could be treated.  Vector oriented control
+schemes were possible, but had to be expressed as sets of scalar 
+expressions.
 
 \begin{figure}[ht!]%% placement specifier
 \centering
-	\includegraphics[width=0.5\textwidth]{RTCC_TF1_BLOCK.PNG}
-%\vspace{1.5in}
-\caption{RTCC Block Library}\label{fig2}
+\includegraphics[width=0.5\textwidth]{RTCC_TF1_BLOCK.PNG}
+\caption{The first order transfer function block. One of approximately 40 reusable components
+	available for physics operators to design control schemes on-the-fly in RTCC.}
+\label{fig:tf}
 \end{figure}
 
+Using this toolkit, a specialist operator---the Plasma Duty Officer (PDO)
+would take instruction from the Session Leader (SL) as to the required
+control schemes needed to support an experimental session.
+The PDO team built an extensive library of RTCC networks.
+Typical responsibilities for the PDO could be to modify the
+networks to probe and tune gains, to replace diagnostic
+signals by alternatives or to develop entirely new schemes.
 
-
-The algorithm definitions, termed {\em RTCC networks}, formed a corpus
-of executable, reusable research results in the area of plasma control.
+The software tools to support the role were sufficient, but
+required training and had some idiosynchrasies and limitations.
+Proposals to improve the applications were put forward, but
+ease of use was not seen as a sufficiently high priority to
+allocate resources.  Figure~\ref{fig:editor} shows the tabular
+graph editor. Each row on the left instantiates one of the 
+blocks, and the output is assigned to the identifier on the right.
+While a supporting viewer which could render the defined network
+as a graph was available, the graphical view did not support
+editing.
 
 \begin{figure}[ht!]%% placement specifier
 \centering
 \includegraphics[width=0.5\textwidth]{L1RTCC.PNG}
-%\vspace{1.5in}
-\caption{RTCC Block Library}\label{fig3}
+\caption{The tabular RTCC network editor, implemented in JET Level-1 software.}\label{fig:editor}
 \end{figure}
 
-The same architecture, but implemented with independent hardware
-and an independent configuration management system and procedure 
-was adopted as part of the project to protect the ITER-like wall
-(PIW project) in 2011.
 
-\subsubsection{RTCC Path to Upgrade}
+%Termed the {\em real-time central controller (RTCC)} this system was
+%part of a suite of general real-time services targeting advanced
+%real-time control research.  The RTCC system was an application 
+%capable of receiving a very wide (and variable) set of input signals
+%aggregated and managed by a companion system, the {\em real-time signal server (RTSS)}.
+%
+%The architecture of this RTCC application was the common pattern of
+%a real-time execution engine configurable with a graph of signal
+%processing blocks.  The library of blocks supported signal ingress,
+%filtering and validation to achieve estimates of plasma parameter
+%state.  Entities to implement control schemes, such as a proportional/integral/derivative
+%(PID controller), transfer functions and general calculation support
+%could then be combined to explore control concepts.  An option to
+%use real-time computed references for the actuator systems, and to 
+%use these in place of the nominal feedfoward time series was also
+%provided.
 
-RTCC was extended repeatedly over more than 20 years as JET
-experimental demands for additional real-time control expanded.
-Proposals to upgrade the supporting ecosystem of tools
-and to refactor layers of the software to better enable
-evolution were made periodically.  However, program and budget
-constraints precluded this for a long time.
+The outputs from RTCC networks could be routed to the actuator systems
+to provide references overriding the pre-configured local control.
+In view of the flexibility, control systems generally offered a restricted
+window within which demands would be accepted.
+Some RTCC networks were also allocated to computing protection signals,
+and could be used to trigger protective actions if limits were breached.
 
-Platform constraints ultimately limited the engineering
-team as it was impractical to upgrade the hardware.
-This restricted the capacity of the system in terms of
-processing and storage.  As a consequence, physics operators
-began to be constrained in what they could achieve.
-This program driven need finally justified an upgrade
-project.
+Following the major ITER-like wall project in 2011, the original RTCC
+system was duplicated so that one instance be dedicated to running
+protection networks, while the other was used for experimental functions.
+This reduced the likelihood that a protection network be misconfigured.
 
-\subsubsection{Project Requirements and Constraints}
+\subsubsection{RTCC Limitations}
+
+As JET enhancements delivered ever more real-time diagnostic signals,
+and expanded the capability of the control systems, the demands
+on the RTCC system increased.  Larger networks, consuming more data,
+required more CPU and memory, or risked skipping control cycles
+and losing information.
+
+An upgrade to RTCC was required to be able to support the needs
+of the JET TaskForce planned experiments.  Planning the design, implement,
+testing and commissioning of the upgrade required considerable
+care given the criticality of the system to oeprations.
+
+
+\subsubsection{Upgrade Project Requirements and Constraints}
 
 The minimum project requirements were to 
 upgrade the system so as to deliver the following.
 
-\begin{enumerate}
-	\item{The required increased capacity in processing and storage.}
-	\item{Full backwards compatibility to reuse any previous control scheme.}
-	\item{Minimised risk to operations}
-\end{enumerate}
+\begin{itemize}
+	\item[REQ-1]{The required increased capacity in processing and storage.}
+	\item[REQ-2]{Full backwards compatibility to reuse any previous control scheme.}
+	\item[REQ-3]{Minimised risk to operations}
+\end{itemize}
 
 The project team were encouraged to find a design solution which
 if possible would in addition
 
 \begin{enumerate}
-	\item{Support rapid development of new components.}
-	\item{Improve the physics user experience.}
+	\item[REQ-4]{Support rapid development of new components.}
+	\item[REQ-5]{Improve the physics user experience.}
 \end{enumerate}
+
+The original implementation assumed a particular hardware platform
+and operating system.  It was also written as a single, large
+C application.  The configuration of the data structures was
+complex and relied on automatically generated intermediate
+files through scripts developed with legacy tools. 
 
 \section{Methodology and Design Approach}
 
@@ -417,13 +484,16 @@ used to define all of the control settings to achieve a given experimental goal 
 
 
 \section{Upgrade Outcomes and Benefits}
-RTCC Block Library
-\begin{figure}[t]%% placement specifier
-\centering
-	\includegraphics[width=0.5\textwidth]{GUI.PNG}
-%\vspace{1.5in}
-\caption{RTCC Block Library}\label{fig6}
-\end{figure}
+
+%GUI RTCC Block Library
+
+%\begin{figure}[t]%% placement specifier
+%\centering
+%\includegraphics[width=0.5\textwidth]{GUI.PNG}
+%\caption{RTCC Block Library}
+%\label{fig6}
+%\end{figure}
+
 Each of the calculation blocks in the RTCC application were ported to MARTe2 {\em Functions}.
 Atypically, the standard block template consisted in a combined vector of value and status.
 This protocol was retained in the updated implementation. This was important to simplify
@@ -442,6 +512,7 @@ recording of computed values.  Managing automatic name generation is one
 of the main tasks in this process.  This introduces a design question.  From
 the perspective of efficiency, and to simplify the translation code, 
 auto-generated names which lack comprehensibility are a good choice. 
+
 This leaves code review in the domain of the meta-programming code, 
 which is practical for checking the intent.  The disadvantage of this
 approach however is that if the detailed results from executing the 
