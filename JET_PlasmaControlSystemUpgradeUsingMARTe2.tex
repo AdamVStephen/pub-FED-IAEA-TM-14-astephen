@@ -274,7 +274,7 @@ comprising sensor, state estimation and actuator control functions.
 	\item{Radio frequency power injection control to achieve fixed ion heating.}
 \end{enumerate}
 
-\subsection{JET Real-time Central Controller}
+\subsection{JET Real-Time Central Controller}
 \label{s_rtcc}
 
 As described in \ref{s_primary_fb} the primary basic control were
@@ -319,26 +319,40 @@ and an independent configuration management system and procedure
 was adopted as part of the project to protect the ITER-like wall
 (PIW project) in 2011.
 
-\subsubsection{RTCC Drivers for Upgrade}
+\subsubsection{RTCC Path to Upgrade}
 
-Infrastructure weaknesses $\ldots$
+RTCC was extended repeatedly over more than 20 years as JET
+experimental demands for additional real-time control expanded.
+Proposals to upgrade the supporting ecosystem of tools
+and to refactor layers of the software to better enable
+evolution were made periodically.  However, program and budget
+constraints precluded this for a long time.
 
-Making the case for an upgrade to the RTCC system was organisationally
-challenging, in spite of the recognised technical limitations of the system.
-These included restrictions on the size and complexity of RTCC networks
-as well as the need for specialist training to become competent in
-using the system and re-engineering previously developed networks.
+Platform constraints ultimately limited the engineering
+team as it was impractical to upgrade the hardware.
+This restricted the capacity of the system in terms of
+processing and storage.  As a consequence, physics operators
+began to be constrained in what they could achieve.
+This program driven need finally justified an upgrade
+project.
 
-\subsubsection{Requirements and Contraints}
+\subsubsection{Project Requirements and Constraints}
 
+The minimum project requirements were to 
+upgrade the system so as to deliver the following.
 
 \begin{enumerate}
-	\item{Backwards compatibility}
-	\item{Increased capacity}
-	\item{Minimise risk to operations}
-	\item{Support new components (blocks)}
-	\item{Improve physics user experience}
-	\item{Enhance JET legacy (code and data)}
+	\item{The required increased capacity in processing and storage.}
+	\item{Full backwards compatibility to reuse any previous control scheme.}
+	\item{Minimised risk to operations}
+\end{enumerate}
+
+The project team were encouraged to find a design solution which
+if possible would in addition
+
+\begin{enumerate}
+	\item{Support rapid development of new components.}
+	\item{Improve the physics user experience.}
 \end{enumerate}
 
 \section{Methodology and Design Approach}
@@ -419,8 +433,6 @@ The second unifying service was the real-time data network. This was a high perf
   Most importantly, the {\em Level-1} configuration management subsystem provided a consistent and detailed model of each subsystem. Representing the attributes and modifiable options for each subsystem as rich parameters, the {\em Level-1} database, user interfaces, and codes provided a meta-programming system for the overall PCS.  This configuration tooling was
 used to define all of the control settings to achieve a given experimental goal (parameter values, calibration, reference time series and inter-system dependencies).  This system tuning was required to be completed before a JET discharge could begin.  
 
- 
-
 \subsubsection{Upgrade Plan}
 
 Making the case for an upgrade to the RTCC system was organisationally
@@ -460,6 +472,105 @@ masked by the anonymous names.
 
 
 \section{Discussion}
+
+Best practice in both system engineering and software engineering 
+aligns with the patterns applied in the design of the JET plasma control system.
+
+From a system engineering perspective, it is highly desirable to be
+able to trace functions to requirements and vice-versa. Computer
+aided design tools to support this workflow are growing in capability.
+The trend is towards model-based system engineering (MBSE).  Some
+practitioners are integrating quantitative simulations within this
+model space. This is generally a top-down engineering flow.
+
+From a software engineering perspective, test based development seeks
+to increase confidence in the correctness of software components.
+Optimal quality can be achieved through the design and rigorous testing
+of reusable modules.  Reusability through composition and configuration
+is an effective technique to define scope boundaries for modules.
+Integrated tests then bound the capability of component assemblies.
+This is a generally bottom-up engineering flow.
+
+Two approaches to bring the system engineering and software engineering
+together are code generation, and domain specific language definition.
+Indeed, they are complementary techniques, and create the possibility
+of a three-tiered engineering stack.
+
+From a computer science point of view, there is no theoretical difference
+between high-level and low-level languages.  They are invariably
+turing complete and hence equivalent. The question is then whether the
+tools are effective in supporting subject matter experts and 
+design/implementation engineers to meet system objectives.
+Automated support for assuring quality can be applied at three
+levels.
+
+In terms of basic definition, automated tools for avoiding trivial errors of expression
+are beneficial.  In low level languages, these are syntax checkers
+and source code "linters".  Although not named equivalent, model
+based system engineering tools provide similar support to assure
+structural and lexical consistency.
+
+Where components are combined to applications,
+static analyzers can apply more sophisticated logic to
+be able to reason about the semantics of the representation
+of the system.  In the system engineering space, compliance 
+matrices verify completeness.  In the software engineering
+space, verifying type consistency is one of many examples
+of automatically identifying errors of reasoning.
+
+Both of these techniques can be applied to the model/code
+by analysis of the structural representation.
+
+When executed, dynamic semantic checking can analyse the 
+correctness of the system by tracking function call
+patterns and data flows.
+
+For a given stack of system models, 
+software frameworks, and tooling or manual procedure which
+can map across the semantic space, there are three
+measures of effectiveness.
+
+Firstly - whether the mid-level tooling - code generators and/or formal
+DSLs are supported by intelligent IDEs.  Support can range from none,
+through in-house development of plugins for existing IDEs and all the
+way to systems such as the proprietary MPS system.
+
+Secondly - whether the three levels and the integration flows
+between them are complete and sufficient to fully describe
+the system.  The law of diminishing returns and pareto principle
+can encourage projects to accept that it is not economically
+feasible for the end to end design flow to achieve 100\%
+coverage.
+
+Finally, there are impedance mismatches between subject matter experts
+across these three levels of formal design activity.  Each formalism
+(system engineering, domain specific language engineering, software
+engineering) has a skillset, methodology and jargon.  The relationships
+between the problem domain and each of these disciplines are complex.
+The solution space is broad. Ultimately, as with mathematical proof,
+the overall success of a design depends on how well the team has
+communicated.
+
+This pattern is well understood by software engineers.  As problems
+become larger and more complex, it becomes necessary to invent
+abstractions and internal tools to make engineering tractable.
+The expectation is that the return on investment on these jigs
+and supporting skeletons will come when requirements shift.
+One risk is that the complexity of the newly minted supports,
+which can be unique to the project, create a skill risk.
+The other is that the shift in the requirements breaks
+assumptions upon which the support tools depended.  This 
+can inevitably be fixed, at the cost of entropy and
+"technical debt".  
+
+Mathematically, the extrema of these trade-offs is captured
+in Godel's theorem.  We can have a system in which all statements
+can be proved, but such systems are extremely limited in the
+range of behaviours they can model.  A system that has the capacity
+to model the complexity we need in practice necessarily 
+contains unprovable statements.
+
+
 
 Granularity, reuse and code generation.
 
@@ -502,11 +613,46 @@ to deliver this support is to use code templating and code generation.  This
 layer of complexity in the tool stack.
 
 
-\
 
 \section{Conclusion}
 
 % Comments on DSLs and tooling.
+The RTCC system enabled JET real-time control experiments to adapt rapidly to new information
+and ideas because the round trip time from concept to implementation did not require 
+external software engineering. This was made possible by offering a flexible, but 
+constrained programmable environment.
+
+The project to upgrade RTCC 
+successfully delivered the minimum project goals of increased capacity with
+full backwards compatibility to reuse all previous control scheme definitions.
+This was done without loss of operational time.
+In addition, the stretch goals of increasing capability and improving
+usability for end users were addressed.  
+
+This change to a critical part of the JET plasma control system, implemented
+at one of the most sensitive times in the programme life was enabled by 
+sound historical architecture choices. These were both based on abstracting
+the definition of real-time data flow and processing into machine 
+processable formats. In respect of inter-system communication, this was the
+real-time data network database, implemented using CODAS Configuration Language
+(CCL) with automatic code generation.  In respect of intra-system algorithm
+representation, this was via the RTCC network graph, and the equivalent RTCC2
+object graph.  
+
+The project feasibility rested not solely on these architectural patterns,
+but on the MARTe framework and the improvements
+and extensions made to this software in preparation for ITER.  
+The JET real-time network extension to ethernet and use of SDN in 2016
+provided a solid foundation.  The quality assurance and functional updates delivered
+by the F4E MARTe2 project reduced the RTCC upgrade risk to an acceptable level.
+
+
+The JET real-time algorithm executor has been ported to a future-proof and future-relevant framework.
+The implementation leaves the possibility to rerun former JET shots against a virtualised
+version of RTCC2. This opens the possibility to running virtual JET experiments.
+These can test alternative state estimation concepts just by replaying the historic data.
+By replacing dynamic elements with models, a closed loop virtual JET emulator could be demonstrated.
+This could have a number of valuable use cases.
 
 
 \section{Glossary}
