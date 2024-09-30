@@ -22,7 +22,8 @@
 %%\documentclass[preprint,12pt]{elsarticle}
 
 \newif\ifpreprint
-\preprinttrue
+%\preprinttrue
+\preprintfalse
 %
 
 \ifpreprint
@@ -329,9 +330,9 @@ protocol\cite{feltonRealtimeMeasurementControl2005b}, and a common parameter man
 \centering
 
 \ifpreprint
-\includegraphics[width=0.5\textwidth]{JG_Felton.PNG}
-\else
 \includegraphics[width=1.0\textwidth]{JG_Felton.PNG}
+\else
+\includegraphics[width=0.5\textwidth]{JG_Felton.PNG}
 \fi
 \caption{The JET Plasma Control System (PCS) architecture from \cite{feltonRealtimeMeasurementControl2005b}.}
 \label{fig:pcs}
@@ -377,7 +378,11 @@ expressions.
 \begin{figure}[ht!]
 \fi
 \centering
+\ifpreprint
+\includegraphics[width=1.0\textwidth]{RTCC_TF1_BLOCK.PNG}
+\else
 \includegraphics[width=0.5\textwidth]{RTCC_TF1_BLOCK.PNG}
+\fi
 \caption{The first order transfer function block. One of approximately 40 reusable components
 	available for physics operators to design control schemes on-the-fly in RTCC.}
 \label{fig:tf}
@@ -408,7 +413,11 @@ editing.
 \begin{figure}[ht!]
 \fi
 \centering
+\ifpreprint
+\includegraphics[width=1.0\textwidth]{L1RTCC.PNG}
+\else
 \includegraphics[width=0.5\textwidth]{L1RTCC.PNG}
+\fi
 \caption{The tabular RTCC network editor, implemented in JET Level-1 software.}\label{fig:editor}
 \end{figure}
 
@@ -509,7 +518,11 @@ deliver services including data collection, state management, and live introspec
 \begin{figure}[ht!]
 \fi
 \centering
+\ifpreprint
+\includegraphics[width=1.0\textwidth]{MARTE.PNG}
+\else
 \includegraphics[width=0.5\textwidth]{MARTE.PNG}
+\fi
 \caption{The MARTe C++ real-time framework permits rapid composition of a new application
 	from a deployment file which describes the component instances, attributes and links.
 	Each application is a tree of cooperating objects.  The components have been designed
@@ -547,15 +560,16 @@ descriptions into MARTe2 format. To run integration tests based on
 historical JET data to verify backwards compatibility.
 
 \section{From Validation to Operation}
+\label{s_validation}
 
 As the software engineering work progressed, each of the deliverables
-was progressively integrated with operation systems.  Wherever
+was progressively integrated with operations systems.  Wherever
 possible, full coverage unit and integration tests were defined
 in the UKAEA gitlab continuous integration (CI) system.
 This included extensive regression tests of the integrated 
 application against recorded data.  This tested not only
-the correctness of the results, but the real-time performance
-running on comparable hardware.  To achieve this required
+the correctness of the results, but the real-time performance.
+  To achieve this required
 some innovation in the use of containers as well as the
 Yocto environment for building custom linux distributions.
 %This is reported elsewhere by \cite{EdJones}.
@@ -577,7 +591,11 @@ to each of the software components.
 \begin{figure}[ht!]
 \fi
 \centering
+\ifpreprint
+\includegraphics[width=1.0\textwidth]{VandV.png}
+\else
 \includegraphics[width=0.5\textwidth]{VandV.png}
+\fi
 \caption{Validation and verification applied to each of the engineering categories related to delivering the upgrade.}
 \label{fig:vandv}
 \end{figure}
@@ -588,7 +606,8 @@ to each of the software components.
 JET operations had entered a particularly sensitive period at the time
 when RTCC2 was ready for deployment. To further minimise the risk, 
 senior management requested that the deployment plan allow for three
-modes of operation.
+modes of operation
+as shown in figure~\ref{fig:r1r2}.
 
 The first mode was to retain the possibility to operate the full
 control system with RTCC2 in parasitic mode. RTCC2 would carry
@@ -618,17 +637,16 @@ actuator systems.
 \begin{figure}[ht!]
 \fi
 \centering
+\ifpreprint
+\includegraphics[width=1.0\textwidth]{R1R2ARCH.PNG}
+\else
 \includegraphics[width=0.5\textwidth]{R1R2ARCH.PNG}
+\fi
 \caption{Multiple modes of operation were requested to reduce
 the risk of updating the plasma control system at a particularly
 	sensitive time for JET operations.}
 \label{fig:r1r2}
 \end{figure}
-
-These modes of operation are illustrated in figure~\ref{fig:r1r2}
-with the optional connections between RTCC2 and the other
-systems denoted as switches (shown in the open position, for
-parasitic operation).
 
 \subsection{Outcomes}
 
@@ -638,14 +656,8 @@ conversion of RTCC control schemes to MARTe2 format, a graphical
 user interface was created.  This provides a more intuitive way to both
 view, and edit, these control graphs.
 
-All of the software components were subjected to rigorous testing.
-This was fully documented, and largely automated to support
-regression testing when code is committed to the repository.
-Automation was extended to fully building new Yocto images, 
-deploying these on an NFS server and booting a test server 
-from the image in order to run hardware-in-the-loop tests.
-
-This supportive quality assurance evidence was sufficient to 
+The extensive quality assurance evidence (described in \S~\ref{s_validation})
+was sufficient to 
 justify a commissioning procedure which had a minimal requirement
 for machine time to verify system conformity.  This is an important
 point as machine time is very expensive.
@@ -655,7 +667,7 @@ functionality was communicated to the task force experiment teams in
 January 2023.  New components were requested to support implementation
 of an X-point radiation tracker control. The benefits of MARTe2 as
 an effective environment in which to develop new modules was proven
-as vector processing and a peak detector components were added.
+as vector processing and a peak detector components were quickly added.
 The vector processing significantly reduced the complexity of 
 the networks.  These features were used to succcessfully support detachment
 control experiments.
@@ -663,144 +675,106 @@ control experiments.
 
 \section{Discussion}
 
-Best practice in both system engineering and software engineering 
-aligns with the patterns applied in the design of the JET plasma control system.
+It is useful to analyse the architecture of the RTCC2 solution
+in the context of modern trends in systems design.
 
-From a system engineering perspective, it is highly desirable to be
-able to trace functions to requirements and vice-versa. Computer
-aided design tools to support this workflow are growing in capability.
-The trend is towards model-based system engineering (MBSE).  Some
-practitioners are integrating quantitative simulations within this
-model space. This is generally a top-down engineering flow.
+Top-down design approaches look to start from formal requirements.
+High-level designs are then developed using Model-Based Systems
+Engineering (MBSE). Models are represented in formal modelling
+languages. Computer aided tools for MBSE support textual and
+graphical descriptions.  Formerly limited to static documents,
+the current generation of applications can include quantitative,
+executable simulations.  The focus is on modelling the system
+domain, independent of implementation issues. 
 
-From a software engineering perspective, test based development seeks
-to increase confidence in the correctness of software components.
-Optimal quality can be achieved through the design and rigorous testing
-of reusable modules.  Reusability through composition and configuration
-is an effective technique to define scope boundaries for modules.
-Integrated tests then bound the capability of component assemblies.
-This is a generally bottom-up engineering flow.
+JET predated the rise of model based design tools.  However, the
+core parameter management system (Level-1) can be seen as a system
+which captures the main domain concepts and relationships. It provides
+the interfaces within which the science and engineering experts
+encode the target behaviour to be delivered by the control system.
 
-Two approaches to bring the system engineering and software engineering
-together are code generation, and domain specific language definition.
-Indeed, they are complementary techniques, and create the possibility
-of a three-tiered engineering stack.
+ITER is more directly applying modern methods and the PCS
+design is developed using formal Systems Engineering.
+These models document the control models which are
+developed in Matlab/Simulink so that they can be
+quantitatively be demonstrated to work correctly.
 
-From a computer science point of view, there is no theoretical difference
-between high-level and low-level languages.  They are invariably
-turing complete and hence equivalent. The question is then whether the
-tools are effective in supporting subject matter experts and 
-implementation engineers to meet system objectives.
-Automated support for assuring quality can be applied at three
-levels.
+Turning to the implementation side, software engineers must
+design a framework suitable to achieve the goals of the models.
+Design models in UML are typically produced along with the software.
+In some contexts, this is similar to the systems engineering.
+More typically though, the lead architects will seek to 
+leverage abstraction to achieve a modular design of components.
+This methodology may value reusability across projects
+above ruthless traceability to requirements.
 
-In terms of basic definition, automated tools for avoiding trivial errors of expression
-are beneficial.  In low level languages, these are syntax checkers
-and source code "linters".  Although not named equivalent, model
-based system engineering tools provide similar support to assure
-structural and lexical consistency.
+JET software frameworks in general have had a strong tradition
+of reusability, initially using data-driven patterns.  The
+original RTCC system is a good example of this.  As JET became
+increasingly complex, it was recognised that factoring out
+the recurring engineering costs common to classes of application
+was essential. This resulted in the MARTe concept which 
+strongly decouples reusable code from modifiable configuration.
 
-Where components are combined to applications,
-static analyzers can apply more sophisticated logic to
-be able to reason about the semantics of the representation
-of the system.  In the system engineering space, compliance 
-matrices verify completeness.  In the software engineering
-space, verifying type consistency is one of many examples
-of automatically identifying errors of reasoning.
+ITER has followed this pattern. It has adopted and enhanced
+the original JET framework, now MARTe2. It has also commissioned
+an independent Real-Time Framework (RTF) specifically for the core plasma
+control system. The provision of dual redundant software 
+systems gives advantages in terms of resilience for the protection system.
 
-Both of these techniques can be applied to the model/code
-by analysis of the structural representation.
+Both domain and implementation designers seek to deal with the complexity of large
+systems through phases of analysis to deconstruct 
+followed by sythensis to compose. Each seeks to balance 
+investment in flexible elements which yield resilience
+against scope creep which may add cost and risk.
 
-When executed, dynamic semantic checking can analyse the 
-correctness of the system by tracking function call
-patterns and data flows.
+Traditional approaches to bring the domain design and implementation
+into alignment rely on teams of experts iterating manually.
+As with other fusion design problems, the limitation of this
+approach is that early assumptions tend to make the 
+dependencies between the two worlds fragile.
+The additional cost of adding a late change to the 
+high level model can be severe for the implementation team.
+Conversely, ensuring that modest changes in the implementation
+find adequate representation and traceability in the system
+engineering can also be challenging.
+Maintaining design integrity across both domains efficiently
+demands a holistic approach.
 
-For a given stack of system models, 
-software frameworks, and tooling or manual procedure which
-can map across the semantic space, there are three
-measures of effectiveness.
+One route is to use modelling tools which incorporate code
+generation capability.  This is starting to become possible,
+and indeed the ITER approach expects to do exactly this.
+The technique is not without risk, since the challenge is
+not simply to generate production code that directly
+reproduces the control models.  Practical aspects like 
+operating system interfaces, data acquisition drivers,
+timing and hardware constraint management must be considered.
 
-Firstly - whether the mid-level tooling - code generators and/or formal
-DSLs are supported by intelligent IDEs.  Support can range from none,
-through in-house development of plugins for existing IDEs and all the
-way to systems such as the proprietary MPS system.
+A variation on the theme is neatly encapsulated by the example
+of RTCC/RTCC2 and underpins the design goals of MARTe. 
+This is to use the modelling tool to perform code generation,
+but with a domain specific target language.  
+For the RTCC application, this target language described 
+the control algorithms in terms of abstract operators 
+(the function blocks), real-time plasma signals as inputs,
+and parameters values (gains, coefficients).
+It was this abstraction that enabled a simple and low risk
+approach to migrating the application to a new software framework.
+By maintaining the conceptual interface between the physics
+operators and the run-time engine, it was possible to have
+high confidence that the replacement system would deliver
+equivalent functionality.  The additional testing to 
+prove the confidence was warranted because of the financial
+and project risks, but it was important in order to 
+approve the project from the outset.
 
-Secondly - whether the three levels and the integration flows
-between them are complete and sufficient to fully describe
-the system.  The law of diminishing returns and pareto principle
-can encourage projects to accept that it is not economically
-feasible for the end to end design flow to achieve 100\%
-coverage.
-
-Finally, there are impedance mismatches between subject matter experts
-across these three levels of formal design activity.  Each formalism
-(system engineering, domain specific language engineering, software
-engineering) has a skillset, methodology and jargon.  The relationships
-between the problem domain and each of these disciplines are complex.
-The solution space is broad. Ultimately, as with mathematical proof,
-the overall success of a design depends on how well the team has
-communicated.
-
-This pattern is well understood by software engineers.  As problems
-become larger and more complex, it becomes necessary to invent
-abstractions and internal tools to make engineering tractable.
-The expectation is that the return on investment on these jigs
-and supporting skeletons will come when requirements shift.
-One risk is that the complexity of the newly minted supports,
-which can be unique to the project, create a skill risk.
-The other is that the shift in the requirements breaks
-assumptions upon which the support tools depended.  This 
-can inevitably be fixed, at the cost of entropy and
-"technical debt".  
-
-Mathematically, the extrema of these trade-offs is captured
-in Godel's theorem.  We can have a system in which all statements
-can be proved, but such systems are extremely limited in the
-range of behaviours they can model.  A system that has the capacity
-to model the complexity we need in practice necessarily 
-contains unprovable statements.
-
-
-
-Granularity, reuse and code generation.
-
-The question of how to preserve human readability of generated code...
-
-\subsection{Engineering Approaches}
-
-\begin{itemize}
-\item{Monolithic}
-\item{Distributed}
-\item{MBSE}
-\item{Custom Code}
-\item{Frameworks}
-\item{Integration Ecosystems}
-\end{itemize}
-
-\subsubsection{Domain Specific Languages (DSLs)}
-
-Where data driven applications achieve a certain level of reconfiguration, they are more commonly
-described in computer science as {\em domain specific languages (DSLs)}. DSLs are characterised
-as a programming language designed for a specific use case.  Benefits of DSLs are that they 
-offer a higher level of abstraction optimized for a specific class of problem. Two classes
-of domain specific language are typically identified. {\em External} DSLs separate the DSL
-code from the standard code (written in a general programming language).  {\em Internal} DSLs
-mix the DSL code and the general-purpose code in the same file.  This is general achieved by
-embedding the DSL into the general-purpose code as a set of libraries or extensions.
-
-In both cases, there is a challenge to adequately support the new task of programming
-in the invented language.  To be effective, general purpose programming languages must
-formally define syntax and semantics. They must be supplied with compilers, or interpreters.
-These language tools are expected to be extended with support for trapping and explaining
-syntax errors as a minimum, and semantic errors preferably.  To increase productivity, 
-engineers working in a language also expect more advanced features such as code completion
-and automated documentation.
-
-For external DSLs, providing language support for basic control flow and iteration
-can help to make programs more efficient and comprehensible.  A common design pattern
-to deliver this support is to use code templating and code generation.  This
-{\em meta-programming} increases productivity, but at the cost of adding another
-layer of complexity in the tool stack.
+When debating design approaches, it is recognised that
+in theory, there is no difference
+between high-level and low-level languages.  As long as they are
+Turing complete they are functionally equivalent. 
+In practice, the effectiveness of using different types
+of language for different engineering workflows is
+important.  As Feynman said, "Notation is powerful.  Invent it.".
 
 
 \section{Conclusion}
@@ -835,6 +809,12 @@ The JET real-time network extension to ethernet and use of SDN in 2016
 provided a solid foundation.  The quality assurance and functional updates delivered
 by the F4E MARTe2 project reduced the RTCC upgrade risk to an acceptable level.
 
+JET innovations in control system architecture have proved their value 
+in many contexts. The power of inventing effective programming tools
+to cope with the growing complexity in modern systems is well recognised
+in other fields.  It is hoped that this project will make the case for
+continued investment in fusion control systems software. To quote the
+motto of the Software Sustainability Institute, "Better Software, Better Research".
 
 The JET real-time algorithm executor has been ported to a future-proof and future-relevant framework.
 The implementation leaves the possibility to rerun former JET shots against a virtualised
