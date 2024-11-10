@@ -243,9 +243,11 @@ exceptions (hardware faults or system corruption).
 
 One of the design strategies for the JET plasma control system was to include
 a flexible real-time central controller (RTCC). This was capable of 
-addressing both engineering aspects directly, for a subset of the overall
-design space.  This enabled very rapid prototyping of new control
-algorithms during the course of JET experimental sessions.
+supporting physics design activity in an inherently real-time environment
+with integrated support for managing off-normal events.
+This enabled very rapid prototyping of new control
+algorithms during the course of JET experimental sessions
+without triggering an iteration of software development.
 
 This paper describes why it was necessary to upgrade JET RTCC as part of the
 final JET operations campaigns.  It describes how the JET design principles
@@ -583,7 +585,20 @@ integrated online end to end checks which must be demonstrated
 before a system can be used in full JET operation.
 
 Figure~\ref{fig:vandv} lists the types of checks which were applied
-to each of the software components.
+to each of the software components. Consistent communication was primarily
+assured by construction augmented by static code review and dynamic
+validation of embedded metadata. 
+RTCC2 configurations were also statically assured by
+construction, with an extensive regression test suite to validate the 
+code generation.
+The python supervisor application consisted mostly of high-level
+semantics with limited variability.  Manual code review of the
+application and the deployment yaml files provided sufficient 
+confidence in correctness.
+Dynamic validation was finally achieved through the MARTe2 configuration 
+parser proving application consistency at run-time.
+Integrated validation was demonstrated during commissioning
+where open circuit testing proved time-series equivalence.
 
 \ifpreprint
 \begin{figure}[p]
