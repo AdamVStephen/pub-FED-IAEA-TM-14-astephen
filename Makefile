@@ -1,6 +1,6 @@
 # $Id: makefile 243 2024-04-06 10:34:40Z rishi $
 
-file=JET_PlasmaControlSystemUpgradeUsingMARTe2
+file=JET_PlasmaControlSystemUpgradeUsingMARTe2-V1
 
 
 all: pdf out nomen

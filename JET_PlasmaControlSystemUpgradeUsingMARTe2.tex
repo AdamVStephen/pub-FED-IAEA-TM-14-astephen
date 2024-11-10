@@ -1,3 +1,4 @@
+\author[UKAEA]{E.~Miniauskas}
 %% 
 %% Copyright 2007-2024 Elsevier Ltd
 %% 
@@ -20,6 +21,16 @@
 %% $Id: elsarticle-template-num.tex 249 2024-04-06 10:51:24Z rishi $
 %%
 %%\documentclass[preprint,12pt]{elsarticle}
+
+% Final Manuscript Preparation Notes.  Adam Stephen 2024/11/10
+%
+% Specifically trying to solve a problem with Reference Generation.
+%
+% From Elsevier Help, the following points were useful.
+%
+% 1. In case of issues - email elsarticle@stmdocs.in
+% 2. There is a beginner course online.
+% 3. 
 
 \newif\ifpreprint
 \preprinttrue
@@ -62,8 +73,8 @@
 
 % Own Packages
 %\usepackage{float}
-\usepackage{nomencl}
-\makenomenclature
+%\usepackage{nomencl}
+%\makenomenclature
 % Take nomenclature title from a section named Glossary to conform to Elsevier guidance for authors
 \renewcommand{\nomname}{\vspace{-.25in}}
 
@@ -132,7 +143,6 @@
 \author[UKAEA]{M.~Wheatley}
 \author[UKAEA]{H.~Baker}
 \author[UKAEA]{A.~Parrott}
-\author[UKAEA]{E.~Miniauskas}
 \author[UKAEA]{K.~Purahoo}
 \author[UKAEA]{M.~Anderton}
 \author[UKAEA]{C.~Stuart}
@@ -862,21 +872,34 @@ This could have a number of valuable uses.
 
 \section{Abbreviations}
 
-\nomenclature{ATM}{Asynchronous Transmission Mode}
-\nomenclature{DSL}{Domain Specific Language}
-\nomenclature{MARTe}{Multi-threaded Application for Real-Time execution}
+\begin{itemize}
+	\item{ATM}{Asynchronous Transmission Mode}
+	\item{DSL}{Domain Specific Language}
+	\item{MARTe}{Multi-threaded Application for Real-Time execution}
+	\item{JET}{Joint European Tokamak}
+	\item{MBSE}{Model Based System Engineering}
+	\item{PCS}{Plasma Control System}
+	\item{RTCC}{Real-Time Central Controller}
+	\item{SDN}{Synchronous Databus Network}
+	\item{UDP}{User Datagram Protocol}
+
+\end{itemize}
+
+%\nomenclature{ATM}{Asynchronous Transmission Mode}
+%\nomenclature{DSL}{Domain Specific Language}
+%\nomenclature{MARTe}{Multi-threaded Application for Real-Time execution}
 %\nomenclature{MARTe2}{Enhanced version of MARTe developed by F4E for ITER.}
 %\nomenclature{Real-Time Thread}{The unit of concurrency in a MARTe2 application.}
 %\nomenclature{DataSource}{A service which abstracts device drivers to handle application I/O in a MARTe2 application.}
 %\nomenclature{Function}{The unit of compute in a MARTe2 application.  Each Real-Time Thread calls one or more Functions.}
-\nomenclature{JET}{Joint European Tokamak}
-\nomenclature{MBSE}{Model Based System Engineering}
-\nomenclature{PCS}{Plasma Control System}
-\nomenclature{RTCC}{Real-Time Central Controller}
-\nomenclature{SDN}{Synchronous Databus Network}
-\nomenclature{UDP}{User Datagram Protocol}
+%\nomenclature{JET}{Joint European Tokamak}
+%\nomenclature{MBSE}{Model Based System Engineering}
+%\nomenclature{PCS}{Plasma Control System}
+%\nomenclature{RTCC}{Real-Time Central Controller}
+%\nomenclature{SDN}{Synchronous Databus Network}
+%\nomenclature{UDP}{User Datagram Protocol}
 
-\printnomenclature
+%\printnomenclature
 
 \section{Acknowledgements}
 
@@ -892,8 +915,4 @@ JET, which was previously a European facility, is now a UK facility collectively
 
 \end{document}
 
-\endinput
-@article{netoUseCasesJoint2015,
-@book{netoMARTeFrameworkMiddleware2011,
-@inproceedings{netoAgileQualityAssurance2016,
-@article{netoSurveyRecentMARTe2011,
+%\endinput
